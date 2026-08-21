@@ -51,7 +51,15 @@ export default function ResultScreen() {
       });
     }
 
-    recordGameResult(won, difficulty, lastResult.livesRemaining, difficultyConfig.lives);
+    // Registra estatísticas e avalia conquistas
+    recordGameResult(
+      won,
+      difficulty,
+      lastResult.livesRemaining,
+      difficultyConfig.lives,
+      lastResult.hintsUsed || 0,
+      puzzle?.tier || "easy"
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

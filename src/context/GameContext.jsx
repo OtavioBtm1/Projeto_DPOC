@@ -1,9 +1,10 @@
-import { createContext, useCallback, useContext, useMemo, useState, useEffect } from "react";
+// src/context/GameContext.jsx
+import { createContext, useCallback, useMemo, useState, useEffect } from "react";
 import { DIFFICULTIES } from "../data/difficulties";
 import { THEMES } from "../data/themes";
 import { ACHIEVEMENTS } from "../data/achievements";
 
-const GameContext = createContext(null);
+export const GameContext = createContext(null);
 
 export function GameProvider({ children }) {
   const [screen, setScreen] = useState("menu");
@@ -32,7 +33,7 @@ export function GameProvider({ children }) {
     }
   });
 
-  // Estatísticas e Conquistas
+  // Estatísticas do jogador
   const [stats, setStats] = useState(() => {
     try {
       const saved = localStorage.getItem("respconex_stats");
@@ -42,6 +43,7 @@ export function GameProvider({ children }) {
     }
   });
 
+  // Conquistas Desbloqueadas
   const [unlockedAchievements, setUnlockedAchievements] = useState(() => {
     try {
       const saved = localStorage.getItem("respconex_achievements");
@@ -62,32 +64,55 @@ export function GameProvider({ children }) {
     localStorage.setItem("respconex_achievements", JSON.stringify(unlockedAchievements));
   }, [unlockedAchievements]);
 
+  // Função central de desbloqueio
   const unlockAchievement = useCallback((achId) => {
+    if (!ACHIEVEMENTS[achId]) return;
     setUnlockedAchievements((prev) => {
       if (prev.includes(achId)) return prev;
-      if (ACHIEVEMENTS && ACHIEVEMENTS[achId]) {
-        setRecentAchievement(ACHIEVEMENTS[achId]);
-        setTimeout(() => setRecentAchievement(null), 5000);
-      }
+      setRecentAchievement(ACHIEVEMENTS[achId]);
+      setTimeout(() => setRecentAchievement(null), 5000);
       return [...prev, achId];
     });
   }, []);
 
+  // Checagem de Conquistas de Progresso de Fases
+  const checkProgressAchievements = useCallback((completedList) => {
+    const easyIds = ["easy-1", "easy-2", "easy-3", "easy-4", "easy-5"];
+    const mediumIds = ["medium-1", "medium-2", "medium-3", "medium-4", "medium-5"];
+    const hardIds = ["hard-1", "hard-2", "hard-3", "hard-4", "hard-5"];
+
+    if (easyIds.every((id) => completedList.includes(id))) {
+      unlockAchievement("easy_complete");
+    }
+
+    if (mediumIds.every((id) => completedList.includes(id))) {
+      unlockAchievement("medium_complete");
+    }
+
+    if (hardIds.every((id) => completedList.includes(id))) {
+      unlockAchievement("hard_complete");
+    }
+
+    if (completedList.length >= 8) {
+      unlockAchievement("halfway");
+    }
+
+    if (completedList.length >= 15) {
+      unlockAchievement("master");
+    }
+  }, [unlockAchievement]);
+
   const markThemeCompleted = useCallback((themeId) => {
     if (!themeId) return;
     setCompletedThemes((prev) => {
-      if (prev.includes(themeId)) return prev;
-      const next = [...prev, themeId];
+      const next = prev.includes(themeId) ? prev : [...prev, themeId];
       localStorage.setItem("respconex_completed", JSON.stringify(next));
-
-      if (next.length >= 5) unlockAchievement("scholar");
-      if (next.length >= THEMES.length) unlockAchievement("master");
-
+      checkProgressAchievements(next);
       return next;
     });
-  }, [unlockAchievement]);
+  }, [checkProgressAchievements]);
 
-  // Valida se a aba do nível está liberada
+  // Checagem de Desbloqueio das Abas
   const isTierUnlocked = useCallback((tierKey) => {
     if (tierKey === "easy") return true;
 
@@ -105,7 +130,7 @@ export function GameProvider({ children }) {
     return false;
   }, [completedThemes]);
 
-  // Valida a liberação sequencial estrita de cada fase (Fase 1 -> Fase 2 -> ...)
+  // Checagem sequencial estrita de fases (1 -> 2 -> 3 -> 4 -> 5)
   const isThemeUnlocked = useCallback((theme) => {
     if (!theme) return false;
     const tier = theme.tier || "easy";
@@ -115,26 +140,27 @@ export function GameProvider({ children }) {
     const tierThemes = THEMES.filter((t) => t.tier === tier);
     const themeIndex = tierThemes.findIndex((t) => t.id === theme.id);
 
-    // A Fase 1 (índice 0) do tier liberado está sempre aberta
     if (themeIndex <= 0) return true;
 
-    // As demais fases só liberam se a anterior imediata foi concluída
     const previousTheme = tierThemes[themeIndex - 1];
     return previousTheme ? completedThemes.includes(previousTheme.id) : false;
   }, [isTierUnlocked, completedThemes]);
 
+  // Registro de Partidas & Conquistas de Jogo
   const recordGameResult = useCallback((won, difficultyId, livesRemaining, totalLives) => {
     setStats((prev) => {
-      const next = { ...prev, gamesPlayed: prev.gamesPlayed + 1 };
+      const nextGamesPlayed = (prev.gamesPlayed || 0) + 1;
+      const nextGamesWon = won ? (prev.gamesWon || 0) + 1 : (prev.gamesWon || 0);
+      let nextFlawless = prev.flawlessWins || 0;
 
-      if (next.gamesPlayed === 1) unlockAchievement("first_blood");
+      if (nextGamesPlayed >= 1) unlockAchievement("first_blood");
+      if (nextGamesPlayed >= 10) unlockAchievement("veteran");
 
       if (won) {
-        next.gamesWon += 1;
-        if (next.gamesWon === 1) unlockAchievement("first_win");
+        if (nextGamesWon >= 1) unlockAchievement("first_win");
 
         if (totalLives !== null && livesRemaining === totalLives) {
-          next.flawlessWins += 1;
+          nextFlawless += 1;
           unlockAchievement("flawless");
         }
 
@@ -142,7 +168,13 @@ export function GameProvider({ children }) {
           unlockAchievement("survivor");
         }
       }
-      return next;
+
+      return {
+        ...prev,
+        gamesPlayed: nextGamesPlayed,
+        gamesWon: nextGamesWon,
+        flawlessWins: nextFlawless,
+      };
     });
   }, [unlockAchievement]);
 
@@ -174,20 +206,16 @@ export function GameProvider({ children }) {
     stats,
     unlockedAchievements,
     recentAchievement,
+    unlockAchievement,
     recordGameResult,
   }), [
     screen, goTo, difficulty, chosenThemeId, lastResult, heartRate, playerName,
     completedThemes, markThemeCompleted, isTierUnlocked, isThemeUnlocked, stats,
-    unlockedAchievements, recentAchievement, recordGameResult
+    unlockedAchievements, recentAchievement, unlockAchievement, recordGameResult
   ]);
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }
 
-export function useGame() {
-  const ctx = useContext(GameContext);
-  if (!ctx) {
-    throw new Error("useGame precisa ser usado dentro de um <GameProvider>");
-  }
-  return ctx;
-}
+// Reexporta o hook do seu arquivo existente para não quebrar componentes que importam de GameContext
+export { useGame } from "../hooks/useGame";

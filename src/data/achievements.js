@@ -1,38 +1,64 @@
+// src/data/achievements.js
+
 export const ACHIEVEMENTS = {
   first_blood: {
     id: "first_blood",
-    title: "Primeiros Passos",
-    description: "Iniciou sua primeira partida. O aprendizado começou!",
-    icon: "🚀"
+    title: "Primeiro Fôlego",
+    description: "Jogou sua primeira partida.",
+    icon: "🫁",
   },
   first_win: {
     id: "first_win",
-    title: "Estudante Aplicado",
-    description: "Venceu sua primeira partida e dominou os primeiros conceitos.",
-    icon: "🎓"
+    title: "Primeira Conquista",
+    description: "Venceu a sua primeira fase.",
+    icon: "🎉",
   },
-  flawless: {
-    id: "flawless",
-    title: "Pulmão de Ferro",
-    description: "Venceu uma partida no modo Médio ou Difícil sem perder nenhuma vida.",
-    icon: "🫁"
+  easy_complete: {
+    id: "easy_complete",
+    title: "Mestre do Básico",
+    description: "Completou todas as 5 fases do nível Fácil.",
+    icon: "🟢",
   },
-  survivor: {
-    id: "survivor",
-    title: "Sobrevivente",
-    description: "Venceu uma partida na superação, com apenas 1 vida restante.",
-    icon: "❤️‍🩹"
+  medium_complete: {
+    id: "medium_complete",
+    title: "Clínico Geral",
+    description: "Completou todas as 5 fases do nível Médio.",
+    icon: "🟡",
   },
-  scholar: {
-    id: "scholar",
-    title: "Especialista",
-    description: "Concluiu 5 temas diferentes de DPOC.",
-    icon: "📚"
+  hard_complete: {
+    id: "hard_complete",
+    title: "Especialista em DPOC",
+    description: "Completou todas as 5 fases do nível Difícil.",
+    icon: "🔴",
+  },
+  halfway: {
+    id: "halfway",
+    title: "Metade do Caminho",
+    description: "Concluiu 8 fases no total.",
+    icon: "⭐",
   },
   master: {
     id: "master",
-    title: "Mestre da DPOC",
-    description: "Completou todos os temas disponíveis no jogo!",
-    icon: "👑"
-  }
+    title: "Zerou o Jogo!",
+    description: "Concluiu todas as 15 fases do RespConex.",
+    icon: "👑",
+  },
+  flawless: {
+    id: "flawless",
+    title: "Impecável",
+    description: "Venceu qualquer fase sem perder nenhuma vida.",
+    icon: "⚡",
+  },
+  survivor: {
+    id: "survivor",
+    title: "No Sufoco",
+    description: "Venceu uma fase restando apenas 1 vida.",
+    icon: "🫀",
+  },
+  veteran: {
+    id: "veteran",
+    title: "Dedicado à Saúde",
+    description: "Completou 10 partidas no total.",
+    icon: "🏆",
+  },
 };

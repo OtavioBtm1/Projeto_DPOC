@@ -69,8 +69,14 @@ export default function GameScreen() {
     return null;
   }
 
+  // Filtra as peças que ainda NÃO foram resolvidas para manter o grid preenchido e compacto
+  const remainingTiles = tiles
+    .map((tile, originalIndex) => ({ tile, originalIndex }))
+    .filter(({ tile }) => !solvedGroups.includes(tile.groupIndex));
+
   return (
-    <section className="screen screen--active">
+    <section className="screen screen--active screen--game">
+      {/* Barra superior de status */}
       <div className="game-top">
         <LivesIndicator total={livesTotal} filled={livesLeft} />
         <div className="game-progress-badge">
@@ -86,34 +92,43 @@ export default function GameScreen() {
         </div>
       )}
 
-      <div className="solved-bands">
-        {solvedGroups.map((groupIndex) => {
-          const group = puzzle.groups[groupIndex];
-          if (!group) return null;
-          return (
-            <SolvedBand
-              key={groupIndex}
-              name={group.name}
-              color={group.color}
-              items={group.items}
-              didYouKnow={group.didYouKnow}
-              initiallyOpen={true}
-            />
-          );
-        })}
-      </div>
+      {/* Container que mantém tudo dentro do campo de visão */}
+      <div className="game-board-container">
+        {/* Grupos resolvidos no topo (compactos) */}
+        {solvedGroups.length > 0 && (
+          <div className="solved-bands">
+            {solvedGroups.map((groupIndex) => {
+              const group = puzzle.groups[groupIndex];
+              if (!group) return null;
+              return (
+                <SolvedBand
+                  key={groupIndex}
+                  name={group.name}
+                  color={group.color}
+                  items={group.items}
+                  didYouKnow={group.didYouKnow}
+                  initiallyOpen={false}
+                />
+              );
+            })}
+          </div>
+        )}
 
-      <div className="grid">
-        {tiles.map((tile, index) => (
-          <Tile
-            key={`${tile.term}-${index}`}
-            term={tile.term}
-            selected={selected.includes(index)}
-            solved={solvedGroups.includes(tile.groupIndex)}
-            shake={shakeIds.includes(index)}
-            onClick={() => toggleTile(index)}
-          />
-        ))}
+        {/* Grid de peças restantes (4 colunas contínuas, sem buracos) */}
+        {remainingTiles.length > 0 && (
+          <div className="grid">
+            {remainingTiles.map(({ tile, originalIndex }) => (
+              <Tile
+                key={`${tile.term}-${originalIndex}`}
+                term={tile.term}
+                selected={selected.includes(originalIndex)}
+                solved={false}
+                shake={shakeIds.includes(originalIndex)}
+                onClick={() => toggleTile(originalIndex)}
+              />
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="status-msg" role="status" aria-live="polite" style={{ color: `var(--${status.tone})` }}>
@@ -130,6 +145,7 @@ export default function GameScreen() {
         </div>
       )}
 
+      {/* Botões de Ação na base */}
       <div className="game-actions">
         <button className="btn" onClick={shuffleBoard} title="Reorganizar peças">
           🔀 Embaralhar

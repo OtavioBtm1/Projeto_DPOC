@@ -252,3 +252,55 @@
 .result-share-btn:hover {
   background: rgba(127, 216, 192, 0.25);
 }
+
+
+/* Container de jogo ajustado para altura móvel */
+.screen--game {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 0.6rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.game-board-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  width: 100%;
+  flex: 1;
+  justify-content: center;
+  min-height: 0;
+}
+
+.solved-bands {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  width: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.tile {
+  min-height: 48px;
+  max-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 0.25rem;
+  font-size: clamp(0.7rem, 2.4vw, 0.85rem);
+  line-height: 1.15;
+  border-radius: 6px;
+  word-break: break-word;
+}
