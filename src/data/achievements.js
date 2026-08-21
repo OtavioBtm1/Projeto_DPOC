@@ -21,7 +21,7 @@ export const ACHIEVEMENTS = {
   },
   medium_complete: {
     id: "medium_complete",
-    title: "Clínico Geral",
+    title: "Enfermeiro formado!",
     description: "Completou todas as 5 fases do nível Médio.",
     icon: "🟡",
   },

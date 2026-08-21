@@ -3,19 +3,19 @@
 export const THEME_TIERS = {
   easy: {
     id: "easy",
-    title: "Nível Básico",
+    title: "Nível Estudante",
     subtitle: "Conscientização, sintomas e fatores de risco",
     color: "var(--mint)",
   },
   medium: {
     id: "medium",
-    title: "Nível Clínico",
+    title: "Nível Enfermeiro",
     subtitle: "Tratamento, exames e técnica inalatória",
     color: "var(--gold)",
   },
   hard: {
     id: "hard",
-    title: "Nível Avançado",
+    title: "Nível Professor ",
     subtitle: "Fisiopatologia, crises agudas e UTI",
     color: "var(--coral)",
   },

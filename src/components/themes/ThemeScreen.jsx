@@ -23,9 +23,9 @@ export default function ThemeScreen() {
   const currentThemes = THEMES.filter((t) => t.tier === activeTier);
 
   const tiersList = [
-    { key: "easy", label: "🟢 Fácil (Básico)", desc: "Sintomas e hábitos" },
-    { key: "medium", label: "🟡 Médio (Clínico)", desc: "Tratamento e exames" },
-    { key: "hard", label: "🔴 Difícil (Avançado)", desc: "Fisiopatologia e UTI" },
+    { key: "easy", label: "🟢 Fácil (Estudante)", desc: "Sintomas e hábitos" },
+    { key: "medium", label: "🟡 Médio (Enfermeiro)", desc: "Tratamento e exames" },
+    { key: "hard", label: "🔴 Difícil (Professor )", desc: "Fisiopatologia e UTI" },
   ];
 
   return (
