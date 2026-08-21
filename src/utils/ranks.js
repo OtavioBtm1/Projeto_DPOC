@@ -9,5 +9,5 @@ export function getPlayerRank(score = 0) {
   if (score >= 100) {
     return { title: "Residente de Plantão 🩺", color: "#fbbf24", badge: "🔹" };
   }
-  return { title: "Estudante de Medicina 📚", color: "#94a3b8", badge: "🌱" };
-}
+  return { title: "Estudante de Enfermagem 📚", color: "#94a3b8", badge: "🌱" };
+} 

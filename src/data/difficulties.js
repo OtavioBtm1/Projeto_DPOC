@@ -8,3 +8,4 @@ export const DIFFICULTIES = {
   medio: { id: "medio", label: "Medio", sublabel: "4 vidas", lives: 4 },
   dificil: { id: "dificil", label: "Dificil", sublabel: "3 vidas", lives: 3 },
 };
+ 
