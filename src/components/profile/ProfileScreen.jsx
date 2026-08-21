@@ -4,6 +4,8 @@ import { THEMES } from "../../data/themes";
 import AchievementBadge from "./AchievementBadge";
 import LungIcon from "../shared/LungIcon";
 import { useState, useEffect } from "react";
+import { getPlayerRank } from "../../utils/ranks";
+import { supabase } from "../../utils/supabase";
 
 const AVATAR_PRESETS = ["🫁", "🩺", "🧑‍⚕️", "🫀", "🔬", "🌟"];
 
@@ -55,20 +57,52 @@ export default function ProfileScreen() {
   const [newProfileName, setNewProfileName] = useState("");
   const [selectedAvatar, setSelectedAvatar] = useState("🫁");
 
+  // Estados de Ranking Global
+  const [globalRank, setGlobalRank] = useState(null);
+  const [loadingRank, setLoadingRank] = useState(true);
+
+  const currentRank = getPlayerRank(stats?.score || 0);
+
   useEffect(() => {
     setTempName(playerName);
   }, [playerName]);
 
-  const progressPct = Math.round((completedThemes.length / THEMES.length) * 100);
+  // Busca a posição do jogador no ranking global do Supabase
+  useEffect(() => {
+    async function fetchPlayerPosition() {
+      if (!activeProfile?.id || !supabase) {
+        setLoadingRank(false);
+        return;
+      }
 
-  const getUserTitle = () => {
-    const total = completedThemes.length;
-    if (total >= 15) return "Especialista em DPOC 🏅";
-    if (total >= 10) return "Defensor Pulmonar 🩺";
-    if (total >= 5) return "Estudante Aplicado 📚";
-    if (total >= 1) return "Explorador da Saúde 🔎";
-    return "Aprendiz da Respiração 🫁";
-  };
+      try {
+        const { data, error } = await supabase
+          .from("leaderboard")
+          .select("id, score")
+          .order("score", { ascending: false });
+
+        if (error) throw error;
+
+        if (data) {
+          const index = data.findIndex((p) => p.id === activeProfile.id);
+          if (index !== -1) {
+            setGlobalRank(index + 1);
+          } else {
+            setGlobalRank("Unranked");
+          }
+        }
+      } catch (err) {
+        console.error("Erro ao buscar posição no ranking:", err);
+        setGlobalRank("-");
+      } finally {
+        setLoadingRank(false);
+      }
+    }
+
+    fetchPlayerPosition();
+  }, [activeProfile?.id, stats?.score]);
+
+  const progressPct = Math.round((completedThemes.length / THEMES.length) * 100);
 
   // Ações do Usuário
   const handleSaveName = () => {
@@ -280,6 +314,41 @@ export default function ProfileScreen() {
       </div>
 
       {/* =========================================
+          BLOCOS DE PONTUAÇÃO E RANKING GLOBAL
+          ========================================= */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", marginBottom: "1.5rem" }}>
+        <div style={{ 
+          background: "linear-gradient(135deg, #0c3b4a 0%, #051318 100%)", 
+          border: "1px solid #38bdf8", 
+          borderRadius: "12px", 
+          padding: "1rem", 
+          textAlign: "center" 
+        }}>
+          <span style={{ color: "#94a3b8", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", display: "block" }}>
+            Pontuação
+          </span>
+          <div style={{ color: "#38bdf8", fontSize: "1.6rem", fontWeight: "bold", margin: "0.2rem 0" }}>
+            {stats?.score || 0} pts
+          </div>
+        </div>
+
+        <div style={{ 
+          background: "linear-gradient(135deg, #0c3b4a 0%, #051318 100%)", 
+          border: "1px solid #38bdf8", 
+          borderRadius: "12px", 
+          padding: "1rem", 
+          textAlign: "center" 
+        }}>
+          <span style={{ color: "#94a3b8", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", display: "block" }}>
+            Ranking Global
+          </span>
+          <div style={{ color: "#fbbf24", fontSize: "1.6rem", fontWeight: "bold", margin: "0.2rem 0" }}>
+            {loadingRank ? "..." : globalRank ? `#${globalRank}` : "Sem posição"}
+          </div>
+        </div>
+      </div>
+
+      {/* =========================================
           CRACHÁ DE EXPORTAÇÃO (Limpo de inputs)
           ========================================= */}
       <div id="profile-export-card" className="export-card">
@@ -299,8 +368,8 @@ export default function ProfileScreen() {
             <h2>{playerName}</h2>
           </div>
           
-          <p className="export-user-title">
-            {getUserTitle()}
+          <p className="export-user-title" style={{ color: currentRank.color, fontWeight: "bold", marginTop: "0.2rem" }}>
+            {currentRank.badge} {currentRank.title}
           </p>
         </div>
 

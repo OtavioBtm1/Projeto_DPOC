@@ -101,9 +101,11 @@ export function GameProvider({ children }) {
           avatar: activeProfile.avatar || "🫁",
           themes_count: activeProfile.completedThemes?.length || 0,
           games_won: activeProfile.stats?.gamesWon || 0,
+          score: activeProfile.stats?.score || 0, // <--- ADICIONE ESTA LINHA
           achievements_count: activeProfile.unlockedAchievements?.length || 0,
           updated_at: new Date().toISOString()
         };
+        
 
         // O 'upsert' insere se o ID for novo, ou atualiza se já existir no Supabase.
         const { error } = await supabase
@@ -269,10 +271,12 @@ export function GameProvider({ children }) {
 
   const recordGameResult = useCallback((won, difficultyId, livesRemaining, totalLives) => {
     updateActiveProfile((profile) => {
-      const prevStats = profile.stats || { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0 };
+      // Garante que o score comece em zero para perfis antigos
+      const prevStats = profile.stats || { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0 };
       const nextGamesPlayed = (prevStats.gamesPlayed || 0) + 1;
       const nextGamesWon = won ? (prevStats.gamesWon || 0) + 1 : (prevStats.gamesWon || 0);
       let nextFlawless = prevStats.flawlessWins || 0;
+      let nextScore = prevStats.score || 0; // Puxa o score atual
 
       if (nextGamesPlayed >= 1) unlockAchievement("first_blood");
       if (nextGamesPlayed >= 10) unlockAchievement("veteran");
@@ -280,14 +284,24 @@ export function GameProvider({ children }) {
       if (won) {
         if (nextGamesWon >= 1) unlockAchievement("first_win");
 
+        // --- SISTEMA DE PONTUAÇÃO ---
+        let pointsEarned = 0;
+        if (difficultyId === "facil" || difficultyId === "easy") pointsEarned = 10;
+        else if (difficultyId === "medio" || difficultyId === "medium") pointsEarned = 25;
+        else if (difficultyId === "dificil" || difficultyId === "hard") pointsEarned = 50;
+        
+        // Bônus Flawless (Vida Cheia)
         if (totalLives !== null && livesRemaining === totalLives) {
           nextFlawless += 1;
+          pointsEarned += 15; 
           unlockAchievement("flawless");
         }
 
         if (totalLives !== null && livesRemaining === 1) {
           unlockAchievement("survivor");
         }
+
+        nextScore += pointsEarned; // Soma os pontos da partida
       }
 
       return {
@@ -297,11 +311,12 @@ export function GameProvider({ children }) {
           gamesPlayed: nextGamesPlayed,
           gamesWon: nextGamesWon,
           flawlessWins: nextFlawless,
+          score: nextScore, // Salva o novo score
         },
       };
     });
   }, [updateActiveProfile, unlockAchievement]);
-
+  
   const goTo = useCallback((nextScreen) => {
     if (nextScreen !== "game" && nextScreen !== "result") {
       setHeartRate("normal");

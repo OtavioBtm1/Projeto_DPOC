@@ -4,6 +4,7 @@ import { useGame } from "../../context/GameContext";
 import { DIFFICULTIES } from "../../data/difficulties";
 import { THEMES } from "../../data/themes";
 import SolvedBand from "../game/SolvedBand";
+import { getPlayerRank } from "../../utils/ranks";
 
 export default function ResultScreen() {
   const {
@@ -15,6 +16,7 @@ export default function ResultScreen() {
     setLastResult,
     markThemeCompleted,
     recordGameResult,
+    stats,
   } = useGame();
 
   const [showAnswers, setShowAnswers] = useState(true);
@@ -37,6 +39,26 @@ export default function ResultScreen() {
   const nextTheme = currentThemeIndex >= 0 && currentThemeIndex < THEMES.length - 1 
     ? THEMES[currentThemeIndex + 1] 
     : null;
+
+  // --- CÁLCULO DE PONTOS PARA EXIBIÇÃO NA TELA ---
+  const livesRemaining = lastResult.livesRemaining ?? 0;
+  const totalLives = difficultyConfig.lives;
+  
+  let pointsEarned = 0;
+  let flawlessBonus = false;
+
+  if (won) {
+    if (difficulty === "facil" || difficulty === "easy") pointsEarned = 10;
+    else if (difficulty === "medio" || difficulty === "medium") pointsEarned = 25;
+    else if (difficulty === "dificil" || difficulty === "hard") pointsEarned = 50;
+
+    if (livesRemaining === totalLives) {
+      pointsEarned += 15;
+      flawlessBonus = true;
+    }
+  }
+
+  const currentRank = getPlayerRank(stats?.score || 0);
 
   useEffect(() => {
     if (won && puzzle?.id) {
@@ -127,6 +149,31 @@ Aprenda sobre saúde respiratória e prevenção!`;
             : "Você praticou conceitos importantes. Aproveite o caderno abaixo para revisar os grupos e suas explicações."}
         </p>
       </div>
+
+      {/* --- CAIXA DE RECOMPENSA DE PONTOS E PATENTE --- */}
+      {won && (
+        <div style={{ 
+          background: "#051318", 
+          border: "1px solid #1e4d5f", 
+          borderRadius: "12px", 
+          padding: "1rem", 
+          maxWidth: "360px", 
+          margin: "0 auto 1.5rem auto",
+          textAlign: "center"
+        }}>
+          <span style={{ color: "#38bdf8", fontSize: "1.2rem", fontWeight: "bold" }}>
+            +{pointsEarned} Pontos ganhos nesta fase!
+          </span>
+          {flawlessBonus && (
+            <div style={{ color: "#fbbf24", fontSize: "0.8rem", marginTop: "0.2rem" }}>
+              ✨ Bônus Flawless (Vida Cheia): +15 pts
+            </div>
+          )}
+          <div style={{ marginTop: "0.6rem", fontSize: "0.85rem", color: currentRank.color, fontWeight: "bold" }}>
+            Patente atual: {currentRank.badge} {currentRank.title}
+          </div>
+        </div>
+      )}
 
       <div className="result-meta" aria-label="Resumo da partida">
         <div className="result-meta-item">
