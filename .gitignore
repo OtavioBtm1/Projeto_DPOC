@@ -11,6 +11,10 @@
 *.rar
 
 
+# =============================== Ambiente
+.env
+.env.*
+
 node_modules/
 dist/
 .env

@@ -11,6 +11,7 @@ import ResultScreen from "./components/result/ResultScreen";
 import ProfileScreen from "./components/profile/ProfileScreen";
 import LibraryScreen from "./components/profile/LibraryScreen";
 import AchievementPopup from "./components/profile/AchievementPopup";
+import RankingScreen from "./components/ranking/RankingScreen";
 
 const SCREENS = {
   menu: MainMenu,
@@ -22,6 +23,7 @@ const SCREENS = {
   result: ResultScreen,
   profile: ProfileScreen,
   library: LibraryScreen,
+  ranking: RankingScreen,
 };
 
 export default function App() {

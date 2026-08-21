@@ -27,7 +27,7 @@ export default function MainMenu() {
         </div>
       </div>
 
-            <div className="menu-list">
+      <div className="menu-list">
         <MenuButton
           title="Jogar"
           subtitle={hasProgress ? `Continuar jornada (${completedThemes.length} concluídos)` : "Iniciar uma nova rodada"}
@@ -38,6 +38,11 @@ export default function MainMenu() {
           title="Meu Perfil" 
           subtitle="Estatísticas e Conquistas" 
           onClick={() => goTo("profile")} 
+        />
+        <MenuButton 
+          title="Ranking Global 🏆" 
+          subtitle="Placar dos melhores jogadores" 
+          onClick={() => goTo("ranking")} 
         />
         <MenuButton 
           title="Biblioteca 📚" 
