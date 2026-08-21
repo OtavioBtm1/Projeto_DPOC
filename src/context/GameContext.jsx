@@ -4,7 +4,6 @@ import { DIFFICULTIES } from "../data/difficulties";
 import { THEMES } from "../data/themes";
 import { ACHIEVEMENTS } from "../data/achievements";
 import { soundManager } from "../utils/audio";
-// 1. IMPORTANTE: Importe o cliente do Supabase que você criou
 import { supabase } from "../utils/supabase"; 
 
 export const GameContext = createContext(null);
@@ -47,7 +46,7 @@ export function GameProvider({ children }) {
         avatar: "🫁",
         createdAt: new Date().toISOString(),
         completedThemes: [],
-        stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0 },
+        stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0 },
         unlockedAchievements: [],
       }];
     }
@@ -79,20 +78,19 @@ export function GameProvider({ children }) {
       name: "Jogador 1",
       avatar: "🫁",
       completedThemes: [],
-      stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0 },
+      stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0 },
       unlockedAchievements: [],
     };
   }, [profiles, activeProfileId]);
 
   // ==========================================
-  // SYNC COM SUPABASE (NOVO)
+  // SYNC COM SUPABASE (COM TRAVA DE SEGURANÇA)
   // ==========================================
   useEffect(() => {
-    // Evita rodar antes da configuração do supabase existir ou se for fallback
-    if (!supabase || activeProfile.id === "fallback") return;
+    // 🛑 TRAVA: Só envia para o ranking global se o jogador já tiver pontuado (> 0)
+    const currentScore = activeProfile.stats?.score || 0;
+    if (!supabase || activeProfile.id === "fallback" || currentScore <= 0) return;
 
-    // Timeout (debounce) de 2 segundos para evitar spammar o banco de dados se o 
-    // jogador estiver mudando de foto/nome muitas vezes seguidas.
     const syncTimeout = setTimeout(async () => {
       try {
         const payload = {
@@ -101,13 +99,11 @@ export function GameProvider({ children }) {
           avatar: activeProfile.avatar || "🫁",
           themes_count: activeProfile.completedThemes?.length || 0,
           games_won: activeProfile.stats?.gamesWon || 0,
-          score: activeProfile.stats?.score || 0, // <--- ADICIONE ESTA LINHA
+          score: currentScore,
           achievements_count: activeProfile.unlockedAchievements?.length || 0,
           updated_at: new Date().toISOString()
         };
-        
 
-        // O 'upsert' insere se o ID for novo, ou atualiza se já existir no Supabase.
         const { error } = await supabase
           .from("leaderboard")
           .upsert(payload, { onConflict: "id" });
@@ -122,13 +118,11 @@ export function GameProvider({ children }) {
 
     return () => clearTimeout(syncTimeout);
   }, [activeProfile]); 
-  // O sync dispara sempre que nome, avatar, stats, conquistas ou temas do activeProfile mudarem.
   // ==========================================
-
 
   const playerName = activeProfile.name;
   const completedThemes = activeProfile.completedThemes || [];
-  const stats = activeProfile.stats || { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0 };
+  const stats = activeProfile.stats || { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0 };
   const unlockedAchievements = activeProfile.unlockedAchievements || [];
 
   const updateActiveProfile = useCallback((updater) => {
@@ -148,7 +142,7 @@ export function GameProvider({ children }) {
       avatar,
       createdAt: new Date().toISOString(),
       completedThemes: [],
-      stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0 },
+      stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0 },
       unlockedAchievements: [],
     };
     setProfiles((prev) => [...prev, newProfile]);
@@ -271,12 +265,11 @@ export function GameProvider({ children }) {
 
   const recordGameResult = useCallback((won, difficultyId, livesRemaining, totalLives) => {
     updateActiveProfile((profile) => {
-      // Garante que o score comece em zero para perfis antigos
       const prevStats = profile.stats || { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0 };
       const nextGamesPlayed = (prevStats.gamesPlayed || 0) + 1;
       const nextGamesWon = won ? (prevStats.gamesWon || 0) + 1 : (prevStats.gamesWon || 0);
       let nextFlawless = prevStats.flawlessWins || 0;
-      let nextScore = prevStats.score || 0; // Puxa o score atual
+      let nextScore = prevStats.score || 0;
 
       if (nextGamesPlayed >= 1) unlockAchievement("first_blood");
       if (nextGamesPlayed >= 10) unlockAchievement("veteran");
@@ -284,13 +277,11 @@ export function GameProvider({ children }) {
       if (won) {
         if (nextGamesWon >= 1) unlockAchievement("first_win");
 
-        // --- SISTEMA DE PONTUAÇÃO ---
         let pointsEarned = 0;
         if (difficultyId === "facil" || difficultyId === "easy") pointsEarned = 10;
         else if (difficultyId === "medio" || difficultyId === "medium") pointsEarned = 25;
         else if (difficultyId === "dificil" || difficultyId === "hard") pointsEarned = 50;
         
-        // Bônus Flawless (Vida Cheia)
         if (totalLives !== null && livesRemaining === totalLives) {
           nextFlawless += 1;
           pointsEarned += 15; 
@@ -301,7 +292,7 @@ export function GameProvider({ children }) {
           unlockAchievement("survivor");
         }
 
-        nextScore += pointsEarned; // Soma os pontos da partida
+        nextScore += pointsEarned;
       }
 
       return {
@@ -311,7 +302,7 @@ export function GameProvider({ children }) {
           gamesPlayed: nextGamesPlayed,
           gamesWon: nextGamesWon,
           flawlessWins: nextFlawless,
-          score: nextScore, // Salva o novo score
+          score: nextScore,
         },
       };
     });
