@@ -10,7 +10,6 @@ export function GameProvider({ children }) {
   const [difficulty, setDifficulty] = useState("medio");
   const [chosenThemeId, setChosenThemeId] = useState(undefined);
   const [lastResult, setLastResult] = useState(null);
-
   const [heartRate, setHeartRate] = useState("normal");
 
   // Nome do jogador
@@ -23,7 +22,7 @@ export function GameProvider({ children }) {
     try { localStorage.setItem("respconex_player_name", name); } catch {}
   }, []);
 
-  // Progresso (temas concluidos)
+  // Fases concluídas salvas
   const [completedThemes, setCompletedThemes] = useState(() => {
     try {
       const saved = localStorage.getItem("respconex_completed");
@@ -33,7 +32,7 @@ export function GameProvider({ children }) {
     }
   });
 
-  // Estatisticas e Conquistas
+  // Estatísticas e Conquistas
   const [stats, setStats] = useState(() => {
     try {
       const saved = localStorage.getItem("respconex_stats");
@@ -52,10 +51,9 @@ export function GameProvider({ children }) {
     }
   });
 
-  // Notificacao visual de nova conquista
   const [recentAchievement, setRecentAchievement] = useState(null);
 
-  // Sync de dados
+  // Sync no LocalStorage
   useEffect(() => {
     localStorage.setItem("respconex_stats", JSON.stringify(stats));
   }, [stats]);
@@ -64,12 +62,13 @@ export function GameProvider({ children }) {
     localStorage.setItem("respconex_achievements", JSON.stringify(unlockedAchievements));
   }, [unlockedAchievements]);
 
-  // Logica de validacao de conquistas
   const unlockAchievement = useCallback((achId) => {
     setUnlockedAchievements((prev) => {
       if (prev.includes(achId)) return prev;
-      setRecentAchievement(ACHIEVEMENTS[achId]);
-      setTimeout(() => setRecentAchievement(null), 5000); // esconde apos 5s
+      if (ACHIEVEMENTS && ACHIEVEMENTS[achId]) {
+        setRecentAchievement(ACHIEVEMENTS[achId]);
+        setTimeout(() => setRecentAchievement(null), 5000);
+      }
       return [...prev, achId];
     });
   }, []);
@@ -80,33 +79,65 @@ export function GameProvider({ children }) {
       if (prev.includes(themeId)) return prev;
       const next = [...prev, themeId];
       localStorage.setItem("respconex_completed", JSON.stringify(next));
-      
-      // Valida conquistas de completismo
+
       if (next.length >= 5) unlockAchievement("scholar");
       if (next.length >= THEMES.length) unlockAchievement("master");
-      
+
       return next;
     });
   }, [unlockAchievement]);
 
+  // Valida se a aba do nível está liberada
+  const isTierUnlocked = useCallback((tierKey) => {
+    if (tierKey === "easy") return true;
+
+    const easyThemes = THEMES.filter((t) => t.tier === "easy");
+    const mediumThemes = THEMES.filter((t) => t.tier === "medium");
+
+    if (tierKey === "medium") {
+      return easyThemes.length > 0 && easyThemes.every((t) => completedThemes.includes(t.id));
+    }
+
+    if (tierKey === "hard") {
+      return mediumThemes.length > 0 && mediumThemes.every((t) => completedThemes.includes(t.id));
+    }
+
+    return false;
+  }, [completedThemes]);
+
+  // Valida a liberação sequencial estrita de cada fase (Fase 1 -> Fase 2 -> ...)
+  const isThemeUnlocked = useCallback((theme) => {
+    if (!theme) return false;
+    const tier = theme.tier || "easy";
+
+    if (!isTierUnlocked(tier)) return false;
+
+    const tierThemes = THEMES.filter((t) => t.tier === tier);
+    const themeIndex = tierThemes.findIndex((t) => t.id === theme.id);
+
+    // A Fase 1 (índice 0) do tier liberado está sempre aberta
+    if (themeIndex <= 0) return true;
+
+    // As demais fases só liberam se a anterior imediata foi concluída
+    const previousTheme = tierThemes[themeIndex - 1];
+    return previousTheme ? completedThemes.includes(previousTheme.id) : false;
+  }, [isTierUnlocked, completedThemes]);
+
   const recordGameResult = useCallback((won, difficultyId, livesRemaining, totalLives) => {
     setStats((prev) => {
       const next = { ...prev, gamesPlayed: prev.gamesPlayed + 1 };
-      
-      // Primeira partida
+
       if (next.gamesPlayed === 1) unlockAchievement("first_blood");
 
       if (won) {
         next.gamesWon += 1;
         if (next.gamesWon === 1) unlockAchievement("first_win");
 
-        // flawless: Venceu sem perder vidas no medio/dificil
         if (totalLives !== null && livesRemaining === totalLives) {
           next.flawlessWins += 1;
           unlockAchievement("flawless");
         }
-        
-        // survivor: Venceu no sufoco
+
         if (totalLives !== null && livesRemaining === 1) {
           unlockAchievement("survivor");
         }
@@ -127,7 +158,7 @@ export function GameProvider({ children }) {
     goTo,
     difficulty,
     setDifficulty,
-    difficultyConfig: DIFFICULTIES[difficulty],
+    difficultyConfig: (DIFFICULTIES && DIFFICULTIES[difficulty]) || { lives: 4 },
     chosenThemeId,
     setChosenThemeId,
     lastResult,
@@ -138,14 +169,16 @@ export function GameProvider({ children }) {
     setPlayerName,
     completedThemes,
     markThemeCompleted,
+    isTierUnlocked,
+    isThemeUnlocked,
     stats,
     unlockedAchievements,
     recentAchievement,
-    recordGameResult
+    recordGameResult,
   }), [
-    screen, goTo, difficulty, chosenThemeId, lastResult, heartRate, playerName, 
-    completedThemes, markThemeCompleted, stats, unlockedAchievements, 
-    recentAchievement, recordGameResult
+    screen, goTo, difficulty, chosenThemeId, lastResult, heartRate, playerName,
+    completedThemes, markThemeCompleted, isTierUnlocked, isThemeUnlocked, stats,
+    unlockedAchievements, recentAchievement, recordGameResult
   ]);
 
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;

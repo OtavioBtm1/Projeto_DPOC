@@ -41,8 +41,6 @@ export default function GameScreen() {
     }
   }, [livesLeft, livesTotal, gameOver, setHeartRate]);
 
-
-  
   useEffect(() => {
     return () => setHeartRate("normal");
   }, [setHeartRate]);
@@ -54,7 +52,7 @@ export default function GameScreen() {
       won: gameOver === "won",
       puzzle,
       solvedCount: solvedGroups.length,
-      totalGroups: puzzle.groups.length,
+      totalGroups: puzzle?.groups?.length || 4,
       hintsUsed,
       livesRemaining: livesLeft,
     });
@@ -65,7 +63,11 @@ export default function GameScreen() {
     }, delay);
 
     return () => window.clearTimeout(timeoutId);
-  }, [gameOver]);
+  }, [gameOver, puzzle, solvedGroups.length, hintsUsed, livesLeft, setLastResult, goTo]);
+
+  if (!puzzle || !puzzle.groups) {
+    return null;
+  }
 
   return (
     <section className="screen screen--active">
@@ -87,6 +89,7 @@ export default function GameScreen() {
       <div className="solved-bands">
         {solvedGroups.map((groupIndex) => {
           const group = puzzle.groups[groupIndex];
+          if (!group) return null;
           return (
             <SolvedBand
               key={groupIndex}
