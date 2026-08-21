@@ -61,4 +61,11 @@ export const ACHIEVEMENTS = {
     description: "Completou 10 partidas no total.",
     icon: "🏆",
   },
+
+  completionist: {
+    id: "completionist",
+    title: "Lenda da Pneumologia",
+    description: "Desbloqueou todas as outras conquistas do RespConex!",
+    icon: "💎",
+  },
 };

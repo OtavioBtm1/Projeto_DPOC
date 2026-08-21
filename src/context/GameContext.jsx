@@ -3,6 +3,7 @@ import { createContext, useCallback, useMemo, useState, useEffect } from "react"
 import { DIFFICULTIES } from "../data/difficulties";
 import { THEMES } from "../data/themes";
 import { ACHIEVEMENTS } from "../data/achievements";
+import { soundManager } from "../utils/audio";
 
 export const GameContext = createContext(null);
 
@@ -64,16 +65,44 @@ export function GameProvider({ children }) {
     localStorage.setItem("respconex_achievements", JSON.stringify(unlockedAchievements));
   }, [unlockedAchievements]);
 
-  // Função central de desbloqueio
+  // Função central de desbloqueio com som e gatilho de Platina
   const unlockAchievement = useCallback((achId) => {
     if (!ACHIEVEMENTS[achId]) return;
+
     setUnlockedAchievements((prev) => {
       if (prev.includes(achId)) return prev;
+
+      // Toca o som de conquista
+      if (soundManager && typeof soundManager.playAchievement === "function") {
+        soundManager.playAchievement();
+      }
+
+      // Notificação visual do banner
       setRecentAchievement(ACHIEVEMENTS[achId]);
       setTimeout(() => setRecentAchievement(null), 5000);
-      return [...prev, achId];
+
+      const next = [...prev, achId];
+
+      // Validação da Conquista Platina (Todas as outras desbloqueadas)
+      const standardKeys = Object.keys(ACHIEVEMENTS).filter((k) => k !== "completionist");
+      const hasAllStandard = standardKeys.every((key) => next.includes(key));
+
+      if (hasAllStandard && !next.includes("completionist")) {
+        setTimeout(() => {
+          unlockAchievement("completionist");
+        }, 1200);
+      }
+
+      return next;
     });
   }, []);
+
+  // 🧪 Expõe para você testar no console (F12) a qualquer momento
+  useEffect(() => {
+    window.testAchievement = (achId) => {
+      unlockAchievement(achId);
+    };
+  }, [unlockAchievement]);
 
   // Checagem de Conquistas de Progresso de Fases
   const checkProgressAchievements = useCallback((completedList) => {
@@ -217,5 +246,4 @@ export function GameProvider({ children }) {
   return <GameContext.Provider value={value}>{children}</GameContext.Provider>;
 }
 
-// Reexporta o hook do seu arquivo existente para não quebrar componentes que importam de GameContext
 export { useGame } from "../hooks/useGame";

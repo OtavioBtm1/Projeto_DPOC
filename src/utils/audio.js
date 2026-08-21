@@ -185,6 +185,42 @@ class SoundController {
       osc.stop(this.ctx.currentTime + durationSeconds);
     } catch (e) {}
   }
+
+  // Som de Fanfarra ao desbloquear Conquista
+  playAchievement() {
+    if (this.muted || !this.ensureContext()) return;
+
+    try {
+      const ctx = this.ctx;
+      const now = ctx.currentTime;
+      
+      // Sequência harmônica ascendente (Dó5 -> Mi5 -> Sol5 -> Dó6)
+      const notes = [
+        { freq: 523.25, time: 0.00, duration: 0.15 },
+        { freq: 659.25, time: 0.12, duration: 0.15 },
+        { freq: 783.99, time: 0.24, duration: 0.18 },
+        { freq: 1046.50, time: 0.40, duration: 0.50 },
+      ];
+      
+      notes.forEach(({ freq, time, duration }) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        
+        osc.type = "triangle";
+        osc.frequency.setValueAtTime(freq, now + time);
+        
+        gain.gain.setValueAtTime(0.0001, now + time);
+        gain.gain.linearRampToValueAtTime(0.35, now + time + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + time + duration);
+        
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        
+        osc.start(now + time);
+        osc.stop(now + time + duration);
+      });
+    } catch (e) {}
+  }
 }
 
 export const soundManager = new SoundController();
