@@ -1,8 +1,8 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { THEMES } from "../data/themes";
 import { DIFFICULTIES } from "../data/difficulties";
 import { shuffleArray } from "../utils";
-
+import { soundManager } from "../utils/audio";
 
 const vibrate = (pattern) => {
   if (typeof navigator !== 'undefined' && navigator.vibrate) {
@@ -25,6 +25,19 @@ function buildTiles(puzzle) {
   return shuffleArray(tiles);
 }
 
+// Converte a proporção de vidas em intervalo de milissegundos (BPM dinâmico)
+function getHeartbeatInterval(livesLeft, totalLives) {
+  if (!totalLives || livesLeft <= 0) return null;
+
+  // Proporção de 1 (cheio) até 0 (sem vidas)
+  const ratio = livesLeft / totalLives;
+
+  if (ratio >= 0.75) return 1100; // ~55 BPM (Relaxado / Normal)
+  if (ratio >= 0.5)  return 850;  // ~70 BPM (Alerta leve)
+  if (ratio >= 0.25) return 600;  // ~100 BPM (Taquicardia moderada)
+  return 420;                     // ~145 BPM (Taquicardia severa / 1 vida)
+}
+
 export function usePuzzle(difficultyId, chosenThemeId) {
   const difficulty = DIFFICULTIES[difficultyId] || DIFFICULTIES.normal;
 
@@ -39,7 +52,32 @@ export function usePuzzle(difficultyId, chosenThemeId) {
   const [activeHint, setActiveHint] = useState(null);
   const [gameOver, setGameOver] = useState(null); // null | "won" | "lost"
 
+  // Controle dinâmico da velocidade do batimento e disparo do Flatline
+  useEffect(() => {
+    if (gameOver === "lost") {
+      soundManager.playFlatline(2.5); // "Piiii" por 2.5 segundos
+      return;
+    }
+
+    if (gameOver === "won" || difficulty.lives === null) {
+      soundManager.stopHeartbeatLoop();
+      return;
+    }
+
+    const interval = getHeartbeatInterval(livesLeft, difficulty.lives);
+    if (interval) {
+      soundManager.startHeartbeatLoop(interval);
+    } else {
+      soundManager.stopHeartbeatLoop();
+    }
+
+    return () => {
+      soundManager.stopHeartbeatLoop();
+    };
+  }, [livesLeft, difficulty.lives, gameOver]);
+
   const restart = useCallback(() => {
+    soundManager.stopHeartbeatLoop();
     const nextPuzzle = pickPuzzle(chosenThemeId);
     setPuzzle(nextPuzzle);
     setTiles(buildTiles(nextPuzzle));
@@ -55,7 +93,10 @@ export function usePuzzle(difficultyId, chosenThemeId) {
   const toggleTile = useCallback(
     (index) => {
       if (gameOver) return;
-      vibrate(40); // Taptic feedback on tap
+
+      soundManager.playSelect();
+      vibrate(40);
+
       setSelected((prev) => {
         if (prev.includes(index)) return prev.filter((i) => i !== index);
         if (prev.length >= 4) return prev;
@@ -65,9 +106,13 @@ export function usePuzzle(difficultyId, chosenThemeId) {
     [gameOver]
   );
 
-  const clearSelection = useCallback(() => setSelected([]), []);
+  const clearSelection = useCallback(() => {
+    soundManager.playSelect();
+    setSelected([]);
+  }, []);
 
   const shuffleBoard = useCallback(() => {
+    soundManager.playSelect();
     setTiles((prev) => {
       const unsolvedIdx = prev
         .map((_, i) => i)
@@ -84,13 +129,14 @@ export function usePuzzle(difficultyId, chosenThemeId) {
 
   const giveHint = useCallback(() => {
     if (gameOver) return;
-    // Pega o primeiro grupo ainda nao resolvido
+
     const unsolvedGroupIndices = puzzle.groups
       .map((_, idx) => idx)
       .filter((idx) => !solvedGroups.includes(idx));
 
     if (unsolvedGroupIndices.length === 0) return;
 
+    soundManager.playSelect();
     const targetGroup = puzzle.groups[unsolvedGroupIndices[0]];
     setHintsUsed((h) => h + 1);
     setActiveHint(`Dica de Categoria: Procure termos ligados a "${targetGroup.name}"`);
@@ -107,26 +153,29 @@ export function usePuzzle(difficultyId, chosenThemeId) {
     const allSame = groupIdxs.every((g) => g === groupIdxs[0]);
 
     if (allSame) {
+      soundManager.playSuccess();
       const newSolved = [...solvedGroups, groupIdxs[0]];
       setSolvedGroups(newSolved);
       setSelected([]);
       setActiveHint(null);
+
       if (newSolved.length === puzzle.groups.length) {
         setStatus({ message: "Excelente! Você concluiu todos os conceitos!", tone: "mint" });
         setGameOver("won");
       } else {
-        vibrate([50, 50, 50]); // Success vibration
+        vibrate([50, 50, 50]);
         setStatus({ message: "Correto! Leia o 'Você Sabia?' e continue.", tone: "mint" });
       }
       return;
     }
 
-    // Calculo de quase acerto (3 corretos de um grupo)
+    // Cálculo de quase acerto (3 corretos de um grupo)
     const counts = {};
     groupIdxs.forEach((g) => (counts[g] = (counts[g] || 0) + 1));
     const maxCount = Math.max(...Object.values(counts));
 
-    vibrate([100, 50, 100]); // Error vibration
+    soundManager.playError();
+    vibrate([100, 50, 100]);
     setShakeIds(selected);
     setTimeout(() => setShakeIds([]), 400);
 
@@ -134,6 +183,7 @@ export function usePuzzle(difficultyId, chosenThemeId) {
     if (difficulty.lives !== null) {
       livesAfter = livesLeft - 1;
       setLivesLeft(livesAfter);
+
       if (livesAfter <= 0) {
         setGameOver("lost");
       }

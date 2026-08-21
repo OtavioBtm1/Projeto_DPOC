@@ -41,6 +41,8 @@ export default function GameScreen() {
     }
   }, [livesLeft, livesTotal, gameOver, setHeartRate]);
 
+
+  
   useEffect(() => {
     return () => setHeartRate("normal");
   }, [setHeartRate]);
