@@ -1,0 +1,52 @@
+/* Variaveis globais de tema (cores, fontes) e reset basico. */
+
+:root {
+  --bg-0: #0a1f26;
+  --bg-1: #0f2c34;
+  --bg-2: #153944;
+  --bg-panel: #17424f;
+  --line: #25525f;
+  --text-hi: #eaf4f2;
+  --text-mid: #b7d2ce;
+  --text-low: #7fa19c;
+  --mint: #7fd8c0;
+  --coral: #f0653d;
+  --gold: #f4c25d;
+  --violet: #c48fe0;
+  --sky: #5fa8d3;
+  --radius: 14px;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-body: "IBM Plex Sans", sans-serif;
+  --font-mono: "IBM Plex Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: radial-gradient(1200px 700px at 15% -10%, #123943 0%, transparent 60%),
+    radial-gradient(1000px 600px at 110% 10%, #0f323b 0%, transparent 55%), var(--bg-0);
+  color: var(--text-hi);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+button {
+  font-family: inherit;
+}
+
+button:focus-visible {
+  outline: 2px solid var(--mint);
+  outline-offset: 2px;
+}

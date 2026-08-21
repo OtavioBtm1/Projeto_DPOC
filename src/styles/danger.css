@@ -1,0 +1,76 @@
+/* Sistema de tensao visual ligado as vidas restantes: acelera o ECG
+   e esquenta o tom da tela conforme o jogador se aproxima da derrota,
+   culminando no efeito de "flatline" quando as vidas acabam. */
+
+.danger-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 0.6s ease, background 0.6s ease;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(240, 101, 61, 0.35) 100%);
+}
+.danger-overlay--normal {
+  opacity: 0;
+}
+.danger-overlay--warning {
+  opacity: 0.35;
+}
+.danger-overlay--critical {
+  opacity: 0.6;
+  animation: pulse-red 1.1s ease-in-out infinite;
+}
+.danger-overlay--flatline {
+  opacity: 0.55;
+  background: radial-gradient(ellipse at center, transparent 32%, rgba(217, 45, 32, 0.65) 100%);
+  animation: pulse-flatline 1s ease-in-out infinite;
+}
+@keyframes pulse-flatline {
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.68;
+  }
+}
+@keyframes pulse-red {
+  0%,
+  100% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+/* Velocidade e cor do ECG conforme heartRate (ver EcgSignature.jsx) */
+.ecg-wrap svg {
+  transition: filter 0.4s ease;
+}
+.ecg--normal .ecg-line {
+  stroke: var(--mint);
+}
+.ecg--warning .ecg-line {
+  stroke: var(--gold);
+  filter: drop-shadow(0 0 6px rgba(244, 194, 93, 0.6));
+}
+.ecg--critical .ecg-line {
+  stroke: var(--coral);
+  filter: drop-shadow(0 0 8px rgba(240, 101, 61, 0.85));
+}
+.ecg--flatline .ecg-line {
+  stroke: #6b7a7d;
+  filter: none;
+  animation: flatline-fade 2.4s ease-in-out infinite;
+}
+@keyframes flatline-fade {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}

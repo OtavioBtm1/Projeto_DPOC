@@ -1,0 +1,254 @@
+/* Estilos especificos da tela de jogo: vidas, tabuleiro, pecas e
+   faixas de grupos resolvidos. */
+
+.game-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.lives {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.lung-icon path {
+  transition: fill 0.15s ease;
+}
+.lung-icon--off path {
+  fill: var(--line);
+}
+.lung-icon--on path {
+  fill: var(--coral);
+  filter: drop-shadow(0 0 4px rgba(240, 101, 61, 0.6));
+}
+.attempts-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-low);
+  margin-left: 6px;
+}
+.puzzle-title {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-low);
+}
+
+.solved-bands {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.band {
+  border-radius: 10px;
+  padding: 12px 14px;
+  animation: band-in 0.35s ease;
+}
+@keyframes band-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.band-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: #0a1f26;
+}
+.band-items {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  color: #0a1f26;
+  opacity: 0.85;
+  margin-top: 2px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 10px 0 16px;
+}
+@media (max-width: 420px) {
+  .grid {
+    gap: 6px;
+  }
+}
+.tile {
+  background: var(--bg-panel);
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8px 6px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--text-hi);
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+}
+.tile:hover {
+  border-color: var(--sky);
+}
+.tile--selected {
+  background: #1f5561;
+  border-color: var(--mint);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(127, 216, 192, 0.18);
+}
+.tile--shake {
+  animation: shake 0.4s ease;
+}
+.tile--solved-hidden {
+  visibility: hidden;
+}
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(6px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+.status-msg {
+  min-height: 20px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+
+/* ---------- Estilos Educativos & UX Adicionados ---------- */
+.band {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: all 0.25s ease;
+}
+
+.band-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.band-content {
+  flex: 1;
+}
+
+.band-toggle-btn {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 11px;
+  font-family: var(--font-sans, inherit);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.band-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.35);
+  transform: translateY(-1px);
+}
+
+.band-did-you-know {
+  margin-top: 4px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  border-left: 3px solid rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  animation: band-in 0.25s ease;
+}
+
+.band-fact-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #fff;
+  opacity: 0.9;
+}
+
+.band-fact-text {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.game-progress-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px 8px;
+  border-radius: 12px;
+  color: var(--text-dim, #a0aec0);
+}
+
+.game-hint-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  margin-bottom: 10px;
+  background: rgba(246, 173, 85, 0.12);
+  border: 1px solid var(--gold, #ecc94b);
+  border-radius: 8px;
+  font-size: 13px;
+  color: #fff;
+  animation: band-in 0.2s ease;
+}
+
+.btn--hint {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn--hint:hover:not(:disabled) {
+  background: rgba(236, 201, 75, 0.15);
+  border-color: var(--gold, #ecc94b);
+}
+
+.result-share-btn {
+  background: rgba(127, 216, 192, 0.15);
+  border-color: var(--mint, #7fd8c0);
+  color: #fff;
+  font-weight: 600;
+}
+
+.result-share-btn:hover {
+  background: rgba(127, 216, 192, 0.25);
+}
