@@ -254,8 +254,8 @@ export function GameProvider({ children }) {
     const attempts = activeProfile.stats?.themeAttempts || {};
     const count = attempts[`${themeId}_${diffId}`] || 0;
 
-    if (diffId === "medio" || diffId === "medium") return count < 2; // Médio = Máx 2 tentativas
-    if (diffId === "dificil" || diffId === "hard") return count < 1; // Difícil = Máx 1 tentativa
+    if (diffId === "medio" || diffId === "medium") return count < 3; // Médio = Máx 2 tentativas
+    if (diffId === "dificil" || diffId === "hard") return count < 2; // Difícil = Máx 1 tentativa
 
     return true;
   }, [activeProfile]);
