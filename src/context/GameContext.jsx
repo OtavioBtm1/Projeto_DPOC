@@ -8,8 +8,8 @@ import { supabase } from "../utils/supabase";
 
 export const GameContext = createContext(null);
 
-const STORAGE_PROFILES_KEY = "respconex_profiles";
-const STORAGE_ACTIVE_ID_KEY = "respconex_active_profile_id";
+const STORAGE_PROFILES_KEY = "respconex_profiles_v2";
+const STORAGE_ACTIVE_ID_KEY = "respconex_active_profile_id_v2";
 
 export function GameProvider({ children }) {
   const [screen, setScreen] = useState("menu");
