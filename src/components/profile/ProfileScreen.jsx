@@ -6,8 +6,10 @@ import LungIcon from "../shared/LungIcon";
 import { useState, useEffect } from "react";
 import { getPlayerRank } from "../../utils/ranks";
 import { supabase } from "../../utils/supabase";
+import AuthModal from "./AuthModal"; 
 
 const AVATAR_PRESETS = ["🫁", "🩺", "🧑‍⚕️", "🫀", "🔬", "🌟"];
+
 
 // Comprime a imagem recortando no centro para 120x120px em JPEG leve
 const compressImage = (file) => {
@@ -41,12 +43,14 @@ const compressImage = (file) => {
 };
 
 export default function ProfileScreen() {
+
+  
   const {
     goTo, stats, unlockedAchievements, completedThemes,
     playerName, setPlayerName, setPlayerAvatar,
     profiles, activeProfile, switchProfile, createProfile, deleteProfile
   } = useGame();
-
+const [showAuthModal, setShowAuthModal] = useState(false);
   // Estados de UI
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCreatingProfile, setIsCreatingProfile] = useState(false);
@@ -312,7 +316,26 @@ export default function ProfileScreen() {
           </form>
         )}
       </div>
+        <div style={{ marginBottom: "1rem", textAlign: "center" }}>
+        <button 
+          onClick={() => setShowAuthModal(true)}
+          className="btn"
+          style={{ background: "#38bdf8", color: "#051318", fontWeight: "bold", padding: "0.6rem 1.2rem" }}
+        >
+          🔑 Sincronizar / Acessar conta com Chave
+        </button>
+      </div>
 
+      {/* Modal que criamos */}
+      <AuthModal 
+        isOpen={showAuthModal} 
+        onClose={() => setShowAuthModal(false)} 
+        onLoginSuccess={(userData) => {
+           // Aqui você faria o "merge" dos dados que vieram do Supabase com o perfil local
+           console.log("Dados carregados do servidor:", userData);
+           alert("Progresso sincronizado!");
+        }}
+      />
       {/* =========================================
           BLOCOS DE PONTUAÇÃO E RANKING GLOBAL
           ========================================= */}

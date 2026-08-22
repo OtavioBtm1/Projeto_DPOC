@@ -32,7 +32,7 @@ export default function MainMenu() {
           title="Jogar"
           subtitle={hasProgress ? `Continuar jornada (${completedThemes.length} concluídos)` : "Iniciar uma nova rodada"}
           primary
-          onClick={() => goTo("difficulty")}
+          onClick={() => goTo("themes")} // <-- Alterado de "difficulty" para "themes"
         />
         <MenuButton 
           title="Meu Perfil" 
