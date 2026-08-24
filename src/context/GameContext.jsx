@@ -19,7 +19,7 @@ export function GameProvider({ children }) {
   const [heartRate, setHeartRate] = useState("normal");
   const [recentAchievement, setRecentAchievement] = useState(null);
 
-  // Inicializa Perfis com themeAttempts e themeMaxPoints
+  // Inicializa Perfis
   const [profiles, setProfiles] = useState(() => {
     try {
       const savedProfiles = localStorage.getItem(STORAGE_PROFILES_KEY);
@@ -30,9 +30,12 @@ export function GameProvider({ children }) {
         name: "Jogador 1",
         avatar: "🫁",
         pin: null, 
+        badges: [], // <-- Guarda as medalhas
+        last_week_rank: null, // <-- Guarda a posição da semana passada
         createdAt: new Date().toISOString(),
         completedThemes: [],
-        stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {} },
+        // Adicionamos o "season" no stats para o celular saber em qual temporada ele está
+        stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {}, season: 1 },
         unlockedAchievements: [],
       }];
     } catch {
@@ -41,9 +44,11 @@ export function GameProvider({ children }) {
         name: "Jogador 1",
         avatar: "🫁",
         pin: null,
+        badges: [],
+        last_week_rank: null,
         createdAt: new Date().toISOString(),
         completedThemes: [],
-        stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {} },
+        stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {}, season: 1 },
         unlockedAchievements: [],
       }];
     }
@@ -71,18 +76,70 @@ export function GameProvider({ children }) {
 
   const activeProfile = useMemo(() => {
     return profiles.find((p) => p.id === activeProfileId) || profiles[0] || {
-      id: "fallback",
-      name: "Jogador 1",
-      avatar: "🫁",
-      pin: null,
-      completedThemes: [],
-      stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {} },
-      unlockedAchievements: [],
+      id: "fallback", name: "Jogador 1", avatar: "🫁", pin: null, badges: [], last_week_rank: null,
+      completedThemes: [], stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {}, season: 1 }, unlockedAchievements: [],
     };
   }, [profiles, activeProfileId]);
 
+  const updateActiveProfile = useCallback((updater) => {
+    setProfiles((prev) => prev.map((profile) => profile.id !== activeProfileId ? profile : updater(profile)));
+  }, [activeProfileId]);
+
   // ==========================================
-  // SYNC COM SUPABASE
+  // SYNC SILENCIOSO (Baixa os dados ao abrir o app)
+  // ==========================================
+  useEffect(() => {
+    if (!supabase || activeProfile.id === "fallback") return;
+
+    const silentPull = async () => {
+      try {
+        // Vai no banco olhar apenas a temporada e as medalhas
+        const { data, error } = await supabase
+          .from("leaderboard")
+          .select("season_number, badges, last_week_rank")
+          .eq("id", activeProfile.id)
+          .maybeSingle();
+
+        if (error || !data) return;
+
+        const localSeason = activeProfile.stats?.season || 1;
+        const remoteSeason = data.season_number || 1;
+
+        // SE O BANCO ESTIVER NUMA TEMPORADA NOVA, ZERA TUDO NO CELULAR E ENTREGA A MEDALHA!
+        if (remoteSeason > localSeason) {
+          updateActiveProfile((profile) => ({
+            ...profile,
+            badges: data.badges || [],
+            last_week_rank: data.last_week_rank || null,
+            completedThemes: [],
+            unlockedAchievements: [],
+            stats: { 
+              gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, 
+              themeAttempts: {}, themeMaxPoints: {}, season: remoteSeason 
+            }
+          }));
+          
+          // Avisa o jogador!
+          alert(`🎉 Uma Nova Temporada Começou!\nSeu ranking e tentativas foram resetados.\nVocê ficou em ${data.last_week_rank}º lugar na semana passada!`);
+        } 
+        // Se for a mesma temporada, só atualiza as medalhas silenciosamente por garantia
+        else {
+          updateActiveProfile((profile) => ({
+            ...profile,
+            badges: data.badges || profile.badges,
+            last_week_rank: data.last_week_rank || profile.last_week_rank
+          }));
+        }
+      } catch (err) {
+        console.warn("Sem internet para checar temporada.");
+      }
+    };
+
+    silentPull();
+  }, [activeProfile.id]); // Roda toda vez que o app carrega o perfil
+
+  // ==========================================
+  // SYNC DE SALVAMENTO (Envia para o Supabase)
   // ==========================================
   useEffect(() => {
     const currentScore = activeProfile.stats?.score || 0;
@@ -104,6 +161,7 @@ export function GameProvider({ children }) {
           completed_themes: activeProfile.completedThemes, 
           unlocked_achievements: activeProfile.unlockedAchievements,
           updated_at: new Date().toISOString()
+          // NOTA: Nós NÃO enviamos "badges", "last_week_rank" nem "season_number" para não sobrescrever o banco!
         };
 
         const { error } = await supabase.from("leaderboard").upsert(payload, { onConflict: "id" });
@@ -116,18 +174,17 @@ export function GameProvider({ children }) {
     return () => clearTimeout(syncTimeout);
   }, [activeProfile]); 
 
+  // ==========================================
+  // FUNÇÕES DE PERFIL RESTANTES
+  // ==========================================
   const playerName = activeProfile.name;
   const completedThemes = activeProfile.completedThemes || [];
-  const stats = activeProfile.stats || { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {} };
+  const stats = activeProfile.stats || { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {}, season: 1 };
   const unlockedAchievements = activeProfile.unlockedAchievements || [];
 
-  const updateActiveProfile = useCallback((updater) => {
-    setProfiles((prev) => prev.map((profile) => profile.id !== activeProfileId ? profile : updater(profile)));
-  }, [activeProfileId]);
-
-  const setPlayerPin = useCallback((pin) => {
-    updateActiveProfile((profile) => ({ ...profile, pin }));
-  }, [updateActiveProfile]);
+  const setPlayerPin = useCallback((pin) => updateActiveProfile((profile) => ({ ...profile, pin })), [updateActiveProfile]);
+  const setPlayerName = useCallback((name) => updateActiveProfile((profile) => ({ ...profile, name })), [updateActiveProfile]);
+  const setPlayerAvatar = useCallback((avatar) => updateActiveProfile((profile) => ({ ...profile, avatar })), [updateActiveProfile]);
 
   const loginWithProfile = useCallback((serverData) => {
     const restored = {
@@ -135,17 +192,13 @@ export function GameProvider({ children }) {
       name: serverData.player_name,
       avatar: serverData.avatar || "🫁",
       pin: serverData.pin || null,
-      badges: serverData.badges || [], 
+      badges: serverData.badges || [], // <-- Importante recuperar isso
       last_week_rank: serverData.last_week_rank || null,
       createdAt: serverData.updated_at || new Date().toISOString(),
       completedThemes: serverData.completed_themes || [],
       stats: serverData.stats || { 
-        gamesPlayed: serverData.games_won || 0, 
-        gamesWon: serverData.games_won || 0, 
-        flawlessWins: 0, 
-        score: serverData.score || 0,
-        themeAttempts: {},
-        themeMaxPoints: {}
+        gamesPlayed: serverData.games_won || 0, gamesWon: serverData.games_won || 0, flawlessWins: 0, score: serverData.score || 0,
+        themeAttempts: {}, themeMaxPoints: {}, season: serverData.season_number || 1
       },
       unlockedAchievements: serverData.unlocked_achievements || [],
     };
@@ -161,9 +214,9 @@ export function GameProvider({ children }) {
   const createProfile = useCallback((name, avatar = "🫁") => {
     const newId = "usr_" + Date.now();
     const newProfile = {
-      id: newId, name: name.trim() || "Novo Jogador", avatar, pin: null,
+      id: newId, name: name.trim() || "Novo Jogador", avatar, pin: null, badges: [], last_week_rank: null,
       createdAt: new Date().toISOString(), completedThemes: [],
-      stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {} },
+      stats: { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {}, season: 1 },
       unlockedAchievements: [],
     };
     setProfiles((prev) => [...prev, newProfile]);
@@ -182,8 +235,6 @@ export function GameProvider({ children }) {
     });
   }, [activeProfileId]);
 
-  const setPlayerName = useCallback((name) => updateActiveProfile((profile) => ({ ...profile, name })), [updateActiveProfile]);
-  const setPlayerAvatar = useCallback((avatar) => updateActiveProfile((profile) => ({ ...profile, avatar })), [updateActiveProfile]);
 
   const unlockAchievement = useCallback((achId) => {
     if (!ACHIEVEMENTS[achId]) return;
@@ -246,32 +297,25 @@ export function GameProvider({ children }) {
     return previousTheme ? completedThemes.includes(previousTheme.id) : false;
   }, [isTierUnlocked, completedThemes]);
 
-  // ==========================================
-  // FUNÇÃO DE LIMITES DE TENTATIVA
-  // ==========================================
   const canPlayMatch = useCallback((themeId, diffId) => {
     if (!themeId || !diffId) return false;
-    if (diffId === "facil" || diffId === "easy") return true; // Fácil = Infinito
+    if (diffId === "facil" || diffId === "easy") return true; 
 
     const attempts = activeProfile.stats?.themeAttempts || {};
     const count = attempts[`${themeId}_${diffId}`] || 0;
 
-    if (diffId === "medio" || diffId === "medium") return count < 3; // Médio = Máx 2 tentativas
-    if (diffId === "dificil" || diffId === "hard") return count < 2; // Difícil = Máx 1 tentativa
+    if (diffId === "medio" || diffId === "medium") return count < 3; 
+    if (diffId === "dificil" || diffId === "hard") return count < 2; 
 
     return true;
   }, [activeProfile]);
 
-  // ==========================================
-  // LÓGICA DE PONTOS INTELIGENTES (DELTA POINTS) E REGISTRO DE TENTATIVAS
-  // ==========================================
   const recordGameResult = useCallback((won, difficultyId, livesRemaining, totalLives) => {
     updateActiveProfile((profile) => {
-      const prevStats = profile.stats || { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {} };
+      const prevStats = profile.stats || { gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, themeAttempts: {}, themeMaxPoints: {}, season: 1 };
       const themeAttempts = prevStats.themeAttempts || {};
       const themeMaxPoints = prevStats.themeMaxPoints || {};
       
-      // REGISTRA A TENTATIVA LOGO DE CARA (seja vitória ou derrota)
       const attemptKey = `${chosenThemeId}_${difficultyId}`;
       const currentAttempts = themeAttempts[attemptKey] || 0;
       const nextThemeAttempts = { ...themeAttempts, [attemptKey]: currentAttempts + 1 };
@@ -288,7 +332,6 @@ export function GameProvider({ children }) {
       if (won) {
         if (nextGamesWon >= 1) unlockAchievement("first_win");
 
-        // CALCULA QUANTOS PONTOS A PARTIDA VALE NO TOTAL (INCLUINDO BÔNUS)
         let potentialPoints = 0;
         if (difficultyId === "facil" || difficultyId === "easy") potentialPoints = 10;
         else if (difficultyId === "medio" || difficultyId === "medium") potentialPoints = 25;
@@ -296,23 +339,18 @@ export function GameProvider({ children }) {
         
         if (totalLives !== null && livesRemaining === totalLives) {
           nextFlawless += 1;
-          potentialPoints += 15; // Bônus Flawless
+          potentialPoints += 15; 
           unlockAchievement("flawless");
         }
 
-        // 🛑 LÓGICA DE EVOLUÇÃO (Anti-Farming): Pega quantos pontos o jogador JÁ ganhou nesse tema antes
         const previousMax = nextThemeMaxPoints[chosenThemeId] || 0;
-        
-        // Só dá pontos se a pontuação atual for MAIOR que a maior pontuação já registrada nesse tema
         if (potentialPoints > previousMax) {
-          const pointsToGive = potentialPoints - previousMax; // Dá só a diferença!
+          const pointsToGive = potentialPoints - previousMax; 
           nextScore += pointsToGive;
-          nextThemeMaxPoints[chosenThemeId] = potentialPoints; // Atualiza o novo recorde do tema
+          nextThemeMaxPoints[chosenThemeId] = potentialPoints; 
         }
 
-        if (totalLives !== null && livesRemaining === 1) {
-          unlockAchievement("survivor");
-        }
+        if (totalLives !== null && livesRemaining === 1) unlockAchievement("survivor");
       }
 
       return {
@@ -323,17 +361,15 @@ export function GameProvider({ children }) {
           gamesWon: nextGamesWon,
           flawlessWins: nextFlawless,
           score: nextScore,
-          themeAttempts: nextThemeAttempts, // Grava que ele gastou a tentativa
-          themeMaxPoints: nextThemeMaxPoints // Grava o recorde de pontos da fase
+          themeAttempts: nextThemeAttempts,
+          themeMaxPoints: nextThemeMaxPoints 
         },
       };
     });
   }, [updateActiveProfile, unlockAchievement, chosenThemeId]); 
   
   const goTo = useCallback((nextScreen) => {
-    if (nextScreen !== "game" && nextScreen !== "result") {
-      setHeartRate("normal");
-    }
+    if (nextScreen !== "game" && nextScreen !== "result") setHeartRate("normal");
     setScreen(nextScreen);
   }, []);
 
@@ -344,8 +380,7 @@ export function GameProvider({ children }) {
     profiles, activeProfile, activeProfileId, createProfile, switchProfile, deleteProfile,
     playerName, setPlayerName, setPlayerAvatar, setPlayerPin, loginWithProfile, 
     completedThemes, markThemeCompleted, isTierUnlocked, isThemeUnlocked, 
-    canPlayMatch, // <--- NOVA FUNÇÃO DE TRAVA EXPORTADA
-    stats, unlockedAchievements, recentAchievement, unlockAchievement, recordGameResult,
+    canPlayMatch, stats, unlockedAchievements, recentAchievement, unlockAchievement, recordGameResult,
   }), [
     screen, goTo, difficulty, chosenThemeId, lastResult, heartRate,
     profiles, activeProfile, activeProfileId, createProfile, switchProfile, deleteProfile,
