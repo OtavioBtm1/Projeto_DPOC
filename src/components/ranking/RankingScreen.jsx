@@ -265,6 +265,7 @@ export default function RankingScreen() {
               {getPlayerRank(selectedPlayer.score || 0).badge} {getPlayerRank(selectedPlayer.score || 0).title}
             </span>
 
+            {/* QUADRO DE PONTUAÇÃO */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", margin: "1.2rem 0" }}>
               <div style={{ background: "#051318", border: "1px solid #1e4d5f", borderRadius: "10px", padding: "0.8rem" }}>
                 <span style={{ color: "#94a3b8", fontSize: "0.75rem", display: "block" }}>Pontuação</span>
@@ -275,6 +276,43 @@ export default function RankingScreen() {
                 <strong style={{ color: "#34d399", fontSize: "1.3rem" }}>{selectedPlayer.games_won || 0}</strong>
               </div>
             </div>
+
+            {/* NOVO: PRATELEIRA DE TROFÉUS (BADGES) */}
+            {selectedPlayer.badges && selectedPlayer.badges.length > 0 && (
+              <div style={{ marginBottom: "1.5rem" }}>
+                <span style={{ color: "#94a3b8", fontSize: "0.75rem", textTransform: "uppercase", display: "block", marginBottom: "0.5rem" }}>
+                  Hall da Fama (Temporadas)
+                </span>
+                <div style={{ display: "flex", gap: "0.5rem", justifyContent: "center", flexWrap: "wrap" }}>
+                  {selectedPlayer.badges.map((badge, idx) => {
+                    // Pega o emoji (ex: o "🏆" de "🏆 Ouro - Sem 1")
+                    const emoji = badge.split(" ")[0]; 
+                    
+                    return (
+                      <div
+                        key={idx}
+                        title={badge} // Este é o textinho que aparece quando clica/passa o mouse!
+                        style={{
+                          width: "42px",
+                          height: "42px",
+                          borderRadius: "50%",
+                          background: "linear-gradient(135deg, #0f2b36 0%, #051318 100%)",
+                          border: "1px solid #38bdf8",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          fontSize: "1.3rem",
+                          cursor: "help",
+                          boxShadow: "0 4px 6px rgba(0,0,0,0.3)"
+                        }}
+                      >
+                        {emoji}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             <button
               onClick={() => setSelectedPlayer(null)}
