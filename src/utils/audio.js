@@ -3,9 +3,13 @@
 class SoundController {
   constructor() {
     this.ctx = null;
+    this.masterGain = null;
     this.muted = typeof window !== 'undefined' 
       ? localStorage.getItem('dpoc_sound_muted') === 'true' 
       : false;
+    this.volume = typeof window !== 'undefined'
+      ? parseFloat(localStorage.getItem('respconex_master_volume') || '0.3')
+      : 0.3;
     this.heartbeatTimer = null;
   }
 
@@ -15,6 +19,11 @@ class SoundController {
       if (!this.ctx) {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         this.ctx = new AudioContext();
+        
+        // Nó de volume master global
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.setValueAtTime(this.muted ? 0 : this.volume, this.ctx.currentTime);
+        this.masterGain.connect(this.ctx.destination);
       }
       if (this.ctx.state === 'suspended') {
         this.ctx.resume();
@@ -26,10 +35,24 @@ class SoundController {
     }
   }
 
+  setVolume(newVolume) {
+    this.volume = Math.max(0, Math.min(1, newVolume));
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('respconex_master_volume', String(this.volume));
+    }
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.setValueAtTime(this.muted ? 0 : this.volume, this.ctx.currentTime);
+    }
+  }
+
   toggleMute() {
     this.muted = !this.muted;
     if (typeof window !== 'undefined') {
       localStorage.setItem('dpoc_sound_muted', String(this.muted));
+      localStorage.setItem('respconex_is_muted', String(this.muted));
+    }
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.setValueAtTime(this.muted ? 0 : this.volume, this.ctx.currentTime);
     }
     if (this.muted) {
       this.stopHeartbeatLoop();
@@ -39,6 +62,10 @@ class SoundController {
 
   isMuted() {
     return this.muted;
+  }
+
+  getVolume() {
+    return this.volume;
   }
 
   // Toque / Seleção de Tile
@@ -57,7 +84,7 @@ class SoundController {
       gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.05);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.masterGain);
 
       osc.start();
       osc.stop(this.ctx.currentTime + 0.05);
@@ -81,7 +108,7 @@ class SoundController {
         gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + idx * 0.08 + 0.28);
 
         osc.connect(gain);
-        gain.connect(this.ctx.destination);
+        gain.connect(this.masterGain);
 
         osc.start(this.ctx.currentTime + idx * 0.08);
         osc.stop(this.ctx.currentTime + idx * 0.08 + 0.28);
@@ -105,7 +132,7 @@ class SoundController {
       gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.22);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.masterGain);
 
       osc.start();
       osc.stop(this.ctx.currentTime + 0.22);
@@ -134,7 +161,7 @@ class SoundController {
 
         osc.connect(filter);
         filter.connect(gain);
-        gain.connect(this.ctx.destination);
+        gain.connect(this.masterGain);
 
         osc.start(this.ctx.currentTime + timeOffset);
         osc.stop(this.ctx.currentTime + timeOffset + duration);
@@ -179,7 +206,7 @@ class SoundController {
       gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx.currentTime + durationSeconds);
 
       osc.connect(gain);
-      gain.connect(this.ctx.destination);
+      gain.connect(this.masterGain);
 
       osc.start();
       osc.stop(this.ctx.currentTime + durationSeconds);
@@ -194,7 +221,6 @@ class SoundController {
       const ctx = this.ctx;
       const now = ctx.currentTime;
       
-      // Sequência harmônica ascendente (Dó5 -> Mi5 -> Sol5 -> Dó6)
       const notes = [
         { freq: 523.25, time: 0.00, duration: 0.15 },
         { freq: 659.25, time: 0.12, duration: 0.15 },
@@ -214,7 +240,7 @@ class SoundController {
         gain.gain.exponentialRampToValueAtTime(0.0001, now + time + duration);
         
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(this.masterGain);
         
         osc.start(now + time);
         osc.stop(now + time + duration);
