@@ -92,48 +92,56 @@ export function GameProvider({ children }) {
     if (!supabase || activeProfile.id === "fallback") return;
 
     const silentPull = async () => {
-      try {
-        // Vai no banco olhar apenas a temporada e as medalhas
-        const { data, error } = await supabase
-          .from("leaderboard")
-          .select("season_number, badges, last_week_rank")
-          .eq("id", activeProfile.id)
-          .maybeSingle();
+    try {
+      // Vai no banco olhar apenas a temporada e as medalhas
+      const { data, error } = await supabase
+        .from("leaderboard")
+        .select("season_number, badges, last_week_rank")
+        .eq("id", activeProfile.id)
+        .maybeSingle();
 
-        if (error || !data) return;
+      if (error || !data) return;
 
-        const localSeason = activeProfile.stats?.season || 1;
-        const remoteSeason = data.season_number || 1;
+      const localSeason = activeProfile.stats?.season || 1;
+      const remoteSeason = data.season_number || 1;
 
-        // SE O BANCO ESTIVER NUMA TEMPORADA NOVA, ZERA TUDO NO CELULAR E ENTREGA A MEDALHA!
-        if (remoteSeason > localSeason) {
-          updateActiveProfile((profile) => ({
-            ...profile,
-            badges: data.badges || [],
-            last_week_rank: data.last_week_rank || null,
-            completedThemes: [],
-            unlockedAchievements: [],
-            stats: { 
-              gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, 
-              themeAttempts: {}, themeMaxPoints: {}, season: remoteSeason 
-            }
-          }));
-          
-          // Avisa o jogador!
-          alert(`🎉 Uma Nova Temporada Começou!\nSeu ranking e tentativas foram resetados.\nVocê ficou em ${data.last_week_rank}º lugar na semana passada!`);
-        } 
-        // Se for a mesma temporada, só atualiza as medalhas silenciosamente por garantia
-        else {
-          updateActiveProfile((profile) => ({
-            ...profile,
-            badges: data.badges || profile.badges,
-            last_week_rank: data.last_week_rank || profile.last_week_rank
-          }));
+      // SE O BANCO ESTIVER NUMA TEMPORADA NOVA, ZERA TUDO NO CELULAR E ENTREGA A MEDALHA!
+      if (remoteSeason > localSeason) {
+        updateActiveProfile((profile) => ({
+          ...profile,
+          badges: data.badges || [],
+          last_week_rank: data.last_week_rank || null,
+          completedThemes: [],
+          unlockedAchievements: [],
+          stats: { 
+            gamesPlayed: 0, gamesWon: 0, flawlessWins: 0, score: 0, 
+            themeAttempts: {}, themeMaxPoints: {}, season: remoteSeason 
+          }
+        }));
+        
+        // 👇 MENSAGEM CORRIGIDA AQUI:
+        let mensagem = "🎉 Uma Nova Temporada Começou!\nSeu ranking e tentativas foram resetados.";
+        
+        if (data.last_week_rank) {
+          mensagem += `\nVocê ficou em ${data.last_week_rank}º lugar na semana passada!`;
+        } else {
+          mensagem += `\nJogue esta semana para garantir seu lugar no pódio!`;
         }
-      } catch (err) {
-        console.warn("Sem internet para checar temporada.");
+        
+        alert(mensagem);
+      } 
+      // Se for a mesma temporada, só atualiza as medalhas silenciosamente por garantia
+      else {
+        updateActiveProfile((profile) => ({
+          ...profile,
+          badges: data.badges || profile.badges,
+          last_week_rank: data.last_week_rank || profile.last_week_rank
+        }));
       }
-    };
+    } catch (err) {
+      console.warn("Sem internet para checar temporada.");
+    }
+  };
 
     silentPull();
   }, [activeProfile.id]); // Roda toda vez que o app carrega o perfil
