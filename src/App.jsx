@@ -54,6 +54,32 @@ export default function App() {
     return () => clearTimeout(timer);
   }, []);
 
+  // DESBLOQUEIO DE ÁUDIO MOBILE NO PRIMEIRO TOQUE
+  useEffect(() => {
+    const unlockAudio = () => {
+      // 1. Acorda os efeitos sonoros do SoundController
+      soundManager.ensureContext();
+
+      // 2. Acorda e toca a música ambiente caso não esteja mutada
+      if (audioRef.current && !isMuted) {
+        audioRef.current.volume = volume;
+        audioRef.current.play().catch(() => {});
+      }
+
+      // Remove os listeners após o primeiro toque
+      window.removeEventListener("click", unlockAudio);
+      window.removeEventListener("touchstart", unlockAudio);
+    };
+
+    window.addEventListener("click", unlockAudio);
+    window.addEventListener("touchstart", unlockAudio);
+
+    return () => {
+      window.removeEventListener("click", unlockAudio);
+      window.removeEventListener("touchstart", unlockAudio);
+    };
+  }, [isMuted, volume]);
+
   // Fechar popover ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -84,8 +110,10 @@ export default function App() {
     setIsMuted(muted);
     if (audioRef.current) {
       audioRef.current.volume = muted ? 0 : volume;
-      if (!muted && audioRef.current.paused) {
+      if (!muted) {
         audioRef.current.play().catch(() => {});
+      } else {
+        audioRef.current.pause();
       }
     }
   };
@@ -101,7 +129,7 @@ export default function App() {
     }
     if (audioRef.current) {
       audioRef.current.volume = newVol;
-      if (audioRef.current.paused && newVol > 0) {
+      if (newVol > 0) {
         audioRef.current.play().catch(() => {});
       }
     }
@@ -109,9 +137,9 @@ export default function App() {
 
   return (
     <div className="app">
-      <audio ref={audioRef} src={BGM_URL} loop preload="auto" />
+      <audio ref={audioRef} src={BGM_URL} loop preload="auto" playsInline />
 
-      {/* CONTROLE DE ÁUDIO RESPONSIVO (Topo Direito / Touch Friendly) */}
+      {/* CONTROLE DE ÁUDIO RESPONSIVO */}
       <div
         ref={popoverRef}
         style={{
@@ -144,7 +172,6 @@ export default function App() {
           {isMuted || volume === 0 ? "🔇" : volume < 0.5 ? "🔉" : "🔊"}
         </button>
 
-        {/* POPOVER COMPACTO PARA CELULAR E DESKTOP */}
         {showAudioPopover && (
           <div
             style={{
