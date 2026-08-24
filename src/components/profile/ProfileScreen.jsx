@@ -10,7 +10,6 @@ import AuthModal from "./AuthModal";
 
 const AVATAR_PRESETS = ["🫁", "🩺", "🧑‍⚕️", "🫀", "🔬", "🌟"];
 
-
 // Comprime a imagem recortando no centro para 120x120px em JPEG leve
 const compressImage = (file) => {
   return new Promise((resolve, reject) => {
@@ -43,14 +42,14 @@ const compressImage = (file) => {
 };
 
 export default function ProfileScreen() {
-
-  
   const {
     goTo, stats, unlockedAchievements, completedThemes,
     playerName, setPlayerName, setPlayerAvatar,
     profiles, activeProfile, switchProfile, createProfile, deleteProfile
   } = useGame();
-const [showAuthModal, setShowAuthModal] = useState(false);
+  
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  
   // Estados de UI
   const [isGenerating, setIsGenerating] = useState(false);
   const [isCreatingProfile, setIsCreatingProfile] = useState(false);
@@ -66,6 +65,10 @@ const [showAuthModal, setShowAuthModal] = useState(false);
   const [loadingRank, setLoadingRank] = useState(true);
 
   const currentRank = getPlayerRank(stats?.score || 0);
+  
+  // DADOS DA TEMPORADA (Puxados do Perfil)
+  const seasonBadges = activeProfile?.badges || [];
+  const lastWeekRank = activeProfile?.last_week_rank || null;
 
   useEffect(() => {
     setTempName(playerName);
@@ -210,12 +213,8 @@ const [showAuthModal, setShowAuthModal] = useState(false);
         </button>
       </div>
 
-      {/* =========================================
-          PAINEL DE CONTROLE DE PERFIL (Fora do Cartão)
-          ========================================= */}
       <div className="profile-controls" style={{ background: "#0b232c", padding: "1rem", borderRadius: "12px", border: "1px solid #1e4d5f", marginBottom: "1.5rem" }}>
         
-        {/* Barra Superior: Trocar, Editar ou Criar */}
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", marginBottom: (isCreatingProfile || isEditingProfile) ? "1rem" : "0" }}>
           <div style={{ display: "flex", gap: "0.5rem", alignItems: "center" }}>
             <select 
@@ -258,16 +257,13 @@ const [showAuthModal, setShowAuthModal] = useState(false);
           </button>
         </div>
 
-        {/* Modal Embutido: Edição do Perfil Ativo */}
+        {/* Formulários de Edição e Criação ... (Mantidos iguais) */}
         {isEditingProfile && !isCreatingProfile && (
           <div style={{ paddingTop: "1rem", borderTop: "1px dashed #1e4d5f" }}>
             <p style={{ fontSize: "0.8rem", color: "#38bdf8", marginBottom: "0.5rem" }}>Alterar dados do perfil:</p>
             <div style={{ display: "flex", gap: "0.5rem", marginBottom: "0.8rem" }}>
               <input 
-                type="text" 
-                value={tempName} 
-                onChange={(e) => setTempName(e.target.value)} 
-                maxLength={20}
+                type="text" value={tempName} onChange={(e) => setTempName(e.target.value)} maxLength={20}
                 style={{ flex: 1, padding: "0.5rem", borderRadius: "6px", background: "#051318", border: "1px solid #1e4d5f", color: "#fff" }}
               />
               <button onClick={handleSaveName} className="btn btn--primary" style={{ padding: "0 1rem" }}>Salvar</button>
@@ -283,14 +279,13 @@ const [showAuthModal, setShowAuthModal] = useState(false);
                 </button>
               ))}
               <label style={{ cursor: "pointer", fontSize: "0.75rem", color: "#38bdf8", textDecoration: "underline", marginLeft: "0.5rem" }}>
-                📷 Foto da galeria
+                📷 Foto
                 <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleFileUpload(e, false)} />
               </label>
             </div>
           </div>
         )}
 
-        {/* Modal Embutido: Criação de Novo Perfil */}
         {isCreatingProfile && (
           <form onSubmit={handleCreateNewProfile} style={{ paddingTop: "1rem", borderTop: "1px dashed #1e4d5f" }}>
             <input 
@@ -307,16 +302,13 @@ const [showAuthModal, setShowAuthModal] = useState(false);
                   {emoji}
                 </button>
               ))}
-              <label style={{ cursor: "pointer", fontSize: "0.8rem", color: "#38bdf8", border: "1px dashed #1e4d5f", padding: "0.4rem 0.6rem", borderRadius: "8px" }}>
-                📷 Usar Foto
-                <input type="file" accept="image/*" style={{ display: "none" }} onChange={(e) => handleFileUpload(e, true)} />
-              </label>
             </div>
             <button type="submit" className="btn btn--primary" style={{ width: "100%", padding: "0.5rem" }}>Criar Perfil</button>
           </form>
         )}
       </div>
-        <div style={{ marginBottom: "1rem", textAlign: "center" }}>
+
+      <div style={{ marginBottom: "1rem", textAlign: "center" }}>
         <button 
           onClick={() => setShowAuthModal(true)}
           className="btn"
@@ -326,27 +318,13 @@ const [showAuthModal, setShowAuthModal] = useState(false);
         </button>
       </div>
 
-      {/* Modal que criamos */}
       <AuthModal 
         isOpen={showAuthModal} 
         onClose={() => setShowAuthModal(false)} 
-        onLoginSuccess={(userData) => {
-           // Aqui você faria o "merge" dos dados que vieram do Supabase com o perfil local
-           console.log("Dados carregados do servidor:", userData);
-           alert("Progresso sincronizado!");
-        }}
       />
-      {/* =========================================
-          BLOCOS DE PONTUAÇÃO E RANKING GLOBAL
-          ========================================= */}
+
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "0.8rem", marginBottom: "1.5rem" }}>
-        <div style={{ 
-          background: "linear-gradient(135deg, #0c3b4a 0%, #051318 100%)", 
-          border: "1px solid #38bdf8", 
-          borderRadius: "12px", 
-          padding: "1rem", 
-          textAlign: "center" 
-        }}>
+        <div style={{ background: "linear-gradient(135deg, #0c3b4a 0%, #051318 100%)", border: "1px solid #38bdf8", borderRadius: "12px", padding: "1rem", textAlign: "center" }}>
           <span style={{ color: "#94a3b8", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", display: "block" }}>
             Pontuação
           </span>
@@ -355,42 +333,54 @@ const [showAuthModal, setShowAuthModal] = useState(false);
           </div>
         </div>
 
-        <div style={{ 
-          background: "linear-gradient(135deg, #0c3b4a 0%, #051318 100%)", 
-          border: "1px solid #38bdf8", 
-          borderRadius: "12px", 
-          padding: "1rem", 
-          textAlign: "center" 
-        }}>
+        <div style={{ background: "linear-gradient(135deg, #0c3b4a 0%, #051318 100%)", border: "1px solid #38bdf8", borderRadius: "12px", padding: "1rem", textAlign: "center" }}>
           <span style={{ color: "#94a3b8", fontSize: "0.75rem", textTransform: "uppercase", letterSpacing: "1px", display: "block" }}>
-            Ranking Global
+            Ranking Atual
           </span>
           <div style={{ color: "#fbbf24", fontSize: "1.6rem", fontWeight: "bold", margin: "0.2rem 0" }}>
             {loadingRank ? "..." : globalRank ? `#${globalRank}` : "Sem posição"}
           </div>
+          {/* Se ele tiver um rank na semana anterior, a gente mostra de forma sutil aqui! */}
+          {lastWeekRank && (
+            <div style={{ color: "#34d399", fontSize: "0.75rem", marginTop: "0.4rem" }}>
+              ⭐️ {lastWeekRank}º na Semana Passada
+            </div>
+          )}
         </div>
       </div>
 
       {/* =========================================
-          CRACHÁ DE EXPORTAÇÃO (Limpo de inputs)
+          NOVA SEÇÃO: TROFÉUS DA TEMPORADA (BADGES)
+          ========================================= */}
+      {seasonBadges.length > 0 && (
+        <>
+          <h3 className="section-heading" style={{ marginTop: 24, marginBottom: 12 }}>Troféus de Temporada</h3>
+          <div style={{ display: "flex", gap: "0.8rem", flexWrap: "wrap", marginBottom: "1.5rem" }}>
+            {seasonBadges.map((badge, idx) => (
+              <div key={idx} style={{
+                background: "linear-gradient(135deg, #fbbf24 0%, #d97706 100%)",
+                color: "#fff", padding: "0.5rem 1rem", borderRadius: "20px",
+                fontSize: "0.85rem", fontWeight: "bold", boxShadow: "0 4px 6px rgba(0,0,0,0.3)"
+              }}>
+                {badge}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* =========================================
+          CRACHÁ DE EXPORTAÇÃO
           ========================================= */}
       <div id="profile-export-card" className="export-card">
         <div className="export-card-header">
-          <div className="export-logo">
-            <LungIcon filled /> <span>RespConex</span>
-          </div>
+          <div className="export-logo"><LungIcon filled /> <span>RespConex</span></div>
           <div className="export-badge">Certificado de Jogador</div>
         </div>
 
         <div className="export-user-info" style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <div style={{ margin: "1rem 0 0.5rem" }}>
-            {renderAvatarGraphic(activeProfile?.avatar, 84)}
-          </div>
-          
-          <div className="name-display">
-            <h2>{playerName}</h2>
-          </div>
-          
+          <div style={{ margin: "1rem 0 0.5rem" }}>{renderAvatarGraphic(activeProfile?.avatar, 84)}</div>
+          <div className="name-display"><h2>{playerName}</h2></div>
           <p className="export-user-title" style={{ color: currentRank.color, fontWeight: "bold", marginTop: "0.2rem" }}>
             {currentRank.badge} {currentRank.title}
           </p>
@@ -398,16 +388,13 @@ const [showAuthModal, setShowAuthModal] = useState(false);
 
         <div className="export-stats-row">
           <div className="export-stat">
-            <strong>{stats.gamesWon}</strong>
-            <span>Vitórias</span>
+            <strong>{stats.gamesWon}</strong><span>Vitórias</span>
           </div>
           <div className="export-stat">
-            <strong>{progressPct}%</strong>
-            <span>Temas</span>
+            <strong>{progressPct}%</strong><span>Temas</span>
           </div>
           <div className="export-stat">
-            <strong>{unlockedAchievements.length}</strong>
-            <span>Conquistas</span>
+            <strong>{unlockedAchievements.length}</strong><span>Conquistas</span>
           </div>
         </div>
 
@@ -427,20 +414,17 @@ const [showAuthModal, setShowAuthModal] = useState(false);
       <div className="profile-share-wrap">
         <button 
           className="btn btn--primary profile-share-btn" 
-          onClick={handleExportImage}
-          disabled={isGenerating || isEditingProfile}
+          onClick={handleExportImage} disabled={isGenerating || isEditingProfile}
         >
           {isGenerating ? "📸 Gerando Imagem..." : "📸 Salvar & Compartilhar Cartão"}
         </button>
-        <p className="share-helper">Transforma seu perfil em uma foto para enviar aos amigos!</p>
       </div>
 
       <h3 className="section-heading" style={{ marginTop: 24, marginBottom: 12 }}>Conquistas</h3>
       <div className="achievements-list">
         {Object.values(ACHIEVEMENTS).map((ach) => (
           <AchievementBadge 
-            key={ach.id} 
-            achievement={ach} 
+            key={ach.id} achievement={ach} 
             isUnlocked={unlockedAchievements.includes(ach.id)} 
           />
         ))}

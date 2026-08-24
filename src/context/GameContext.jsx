@@ -135,6 +135,8 @@ export function GameProvider({ children }) {
       name: serverData.player_name,
       avatar: serverData.avatar || "🫁",
       pin: serverData.pin || null,
+      badges: serverData.badges || [], 
+      last_week_rank: serverData.last_week_rank || null,
       createdAt: serverData.updated_at || new Date().toISOString(),
       completedThemes: serverData.completed_themes || [],
       stats: serverData.stats || { 
