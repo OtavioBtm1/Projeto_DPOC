@@ -29,7 +29,8 @@ export default function AuthModal({ isOpen, onClose, mandatory = false }) {
   if (!isOpen) return null;
 
   // Função para Proteger a conta ATUAL com Nome e PIN de 4 números
-  const handleSecureProfile = (e) => {
+  // Função para Proteger a conta ATUAL com Nome e PIN de 4 números
+  const handleSecureProfile = async (e) => { // <-- Adicionamos o "async" aqui
     e.preventDefault();
     
     if (!newName.trim() || newName.trim().toLowerCase() === "jogador 1") {
@@ -44,18 +45,39 @@ export default function AuthModal({ isOpen, onClose, mandatory = false }) {
     
     setError("");
     setLoading(true);
-    
-    // Salva o Nome e o PIN no perfil ativo local (o GameContext manda pro Supabase depois)
-    setPlayerName(newName.trim());
-    setPlayerPin(pinInput);
-    
-    setLoading(false);
-    setSuccess(true);
-    
-    setTimeout(() => {
-      setSuccess(false);
-      onClose();
-    }, 2000);
+
+    try {
+      // 👇 NOVO: Verifica no Supabase se esse nome já foi pego por outra pessoa
+      const { data: existingUser, error: checkError } = await supabase
+        .from("leaderboard")
+        .select("id")
+        .ilike("player_name", newName.trim()) // ilike ignora maiúsculas/minúsculas (Otávio = otávio)
+        .neq("id", activeProfile.id) // Garante que não vai bloquear se for você mesmo editando sua conta
+        .maybeSingle();
+
+      if (existingUser) {
+        setError("❌ Este nome já está em uso por outro jogador! Escolha outro.");
+        setLoading(false);
+        return; // Para tudo e não deixa salvar!
+      }
+
+      // Se passou pela verificação, o nome está livre! Salva normal:
+      setPlayerName(newName.trim());
+      setPlayerPin(pinInput);
+      
+      setSuccess(true);
+      
+      setTimeout(() => {
+        setSuccess(false);
+        onClose();
+      }, 2000);
+
+    } catch (err) {
+      console.error("Erro ao verificar nome:", err);
+      setError("Erro de conexão. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Função para recuperar uma conta do Supabase (Nome + PIN)
