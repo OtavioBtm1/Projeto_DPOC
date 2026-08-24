@@ -37,6 +37,15 @@ export const ACHIEVEMENTS = {
     description: "Concluiu 8 fases no total.",
     icon: "⭐",
   },
+  
+  // 👇 NOVA CONQUISTA DO EL NIÑO ADICIONADA AQUI
+  climate_guardian: {
+    id: "climate_guardian",
+    title: "Guardião do Clima",
+    description: "Acessou a biblioteca e compreendeu os impactos do El Niño na DPOC.",
+    icon: "🌍",
+  },
+
   master: {
     id: "master",
     title: "Zerou o Jogo!",
@@ -61,7 +70,6 @@ export const ACHIEVEMENTS = {
     description: "Completou 10 partidas no total.",
     icon: "🏆",
   },
-
   completionist: {
     id: "completionist",
     title: "Lenda da Pneumologia",

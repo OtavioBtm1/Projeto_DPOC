@@ -176,10 +176,11 @@ export const THEMES = [
         didYouKnow: "Lavar as mãos reduz infecções respiratórias simples que poderiam descompensar os pulmões.",
       },
       {
-        name: "Proteção em Dias Frios",
+        // 👇 NOVO GRUPO: CLIMA EXTREMO E EL NIÑO (FÁCIL)
+        name: "Clima Extremo e El Niño",
         color: "var(--mint)",
-        items: ["Cobrir nariz e boca", "Evitar vento gelado", "Tomar água morna", "Vacinar da gripe"],
-        didYouKnow: "O ar frio e seco fecha os brônquios; usar cachecol aquece o ar antes de entrar nos pulmões.",
+        items: ["Ar muito seco", "Ondas de calor", "Uso de umidificador", "Hidratação extra"],
+        didYouKnow: "Eventos como o El Niño trazem ondas de calor e ar muito seco, exigindo mais água para o muco não ressecar nos pulmões.",
       },
       {
         name: "Respiração no Dia a Dia",
@@ -356,10 +357,11 @@ export const THEMES = [
         didYouKnow: "O freio labial cria pressão positiva que mantém os brônquios abertos na expiração.",
       },
       {
-        name: "Organização da Casa",
+        // 👇 NOVO GRUPO: ALERTA AMBIENTAL E PREVENÇÃO (MÉDIO)
+        name: "Alerta Ambiental (El Niño)",
         color: "var(--sky)",
-        items: ["Itens na altura do peito", "Evitar subir escadas", "Carrinho para compras", "Cozinhar sentado"],
-        didYouKnow: "Evitar abaixar e levantar repetidamente reduz a pressão dos órgãos sobre os pulmões.",
+        items: ["Inversão térmica", "Fumaça de queimadas", "Lavar o nariz com soro", "Evitar sair no pico do calor"],
+        didYouKnow: "A inversão térmica e as secas do El Niño concentram os poluentes na altura do nariz; a lavagem nasal diária é fundamental.",
       },
       {
         name: "Ritmo de Trabalho",
@@ -400,10 +402,11 @@ export const THEMES = [
         didYouKnow: "Rins retêm bicarbonato (HCO3) para compensar o acúmulo crônico de CO2 no sangue.",
       },
       {
-        name: "Causas Genéticas",
+        // 👇 NOVO GRUPO: IMPACTO FISIOLÓGICO DO CLIMA (DIFÍCIL)
+        name: "Exacerbação Climática",
         color: "var(--violet)",
-        items: ["Alfa-1 antitripsina", "Genótipo PiZZ", "Enfisema panacinar", "Início em jovens"],
-        didYouKnow: "A deficiência de Alfa-1 Antitripsina causa enfisema grave mesmo em não fumantes jovens.",
+        items: ["Estresse térmico prolongado", "Material particulado", "Broncoespasmo induzido", "Desidratação de vias aéreas"],
+        didYouKnow: "Ondas de calor extremo causadas pelo El Niño geram estresse térmico e desidratam o muco, elevando drasticamente as exacerbações graves em idosos com DPOC.",
       },
     ],
   },
