@@ -56,41 +56,38 @@ export default function App() {
 
   // DESBLOQUEIO DE ÁUDIO MOBILE NO PRIMEIRO TOQUE
   useEffect(() => {
-    let unlocked = false;
-    const unlockAudio = () => {
-      if (unlocked) return;
-      unlocked = true;
-
+    const unlockAudio = async () => {
       // 1. Acorda os efeitos sonoros do SoundController
       soundManager.ensureContext();
 
-      // 2. Conecta a música ambiente à Web Audio API (Isso burla o bloqueio do celular!)
+      // 2. Conecta a música ambiente à Web Audio API
       if (audioRef.current) {
         if (typeof soundManager.connectBGM === 'function') {
           soundManager.connectBGM(audioRef.current);
         }
+        
+        // Joga o sinal original no máximo (quem abaixa o volume agora é o SoundManager)
+        audioRef.current.volume = 1;
+
         if (!isMuted) {
-          audioRef.current.play().catch(() => console.log("Aguardando interação no mobile"));
+          try {
+            await audioRef.current.play();
+          } catch (e) {
+            console.log("Navegador ainda bloqueando:", e);
+          }
         }
       }
-
-      // Remove os listeners após o primeiro toque
-      window.removeEventListener("click", unlockAudio);
-      window.removeEventListener("touchstart", unlockAudio);
-      window.removeEventListener("pointerdown", unlockAudio);
     };
 
-    window.addEventListener("click", unlockAudio);
-    window.addEventListener("touchstart", unlockAudio);
-    window.addEventListener("pointerdown", unlockAudio);
+    // O "capture: true" e "once: true" são a mágica que impede o React de bloquear o evento!
+    window.addEventListener("click", unlockAudio, { capture: true, once: true });
+    window.addEventListener("touchstart", unlockAudio, { capture: true, once: true });
 
     return () => {
-      window.removeEventListener("click", unlockAudio);
-      window.removeEventListener("touchstart", unlockAudio);
-      window.removeEventListener("pointerdown", unlockAudio);
+      window.removeEventListener("click", unlockAudio, { capture: true });
+      window.removeEventListener("touchstart", unlockAudio, { capture: true });
     };
   }, [isMuted]);
-
   // Fechar popover ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
