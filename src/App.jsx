@@ -28,8 +28,7 @@ const SCREENS = {
   ranking: RankingScreen,
 };
 
-const BGM_URL = "https://cdn.pixabay.com/download/audio/2022/11/06/audio_c93149ec9c.mp3?filename=gentle-piano-love-126292.mp3";
-
+const BGM_URL = "/neonbumba-chill-gaming-music-relaxing-background-527562.mp3";
 export default function App() {
   const { screen, heartRate } = useGame();
   const ActiveScreen = SCREENS[screen] ?? MainMenu;
@@ -56,29 +55,40 @@ export default function App() {
 
   // DESBLOQUEIO DE ÁUDIO MOBILE NO PRIMEIRO TOQUE
   useEffect(() => {
+    let unlocked = false;
     const unlockAudio = () => {
+      if (unlocked) return;
+      unlocked = true;
+
       // 1. Acorda os efeitos sonoros do SoundController
       soundManager.ensureContext();
 
-      // 2. Acorda e toca a música ambiente caso não esteja mutada
-      if (audioRef.current && !isMuted) {
-        audioRef.current.volume = volume;
-        audioRef.current.play().catch(() => {});
+      // 2. Conecta a música ambiente à Web Audio API (Isso burla o bloqueio do celular!)
+      if (audioRef.current) {
+        if (typeof soundManager.connectBGM === 'function') {
+          soundManager.connectBGM(audioRef.current);
+        }
+        if (!isMuted) {
+          audioRef.current.play().catch(() => console.log("Aguardando interação no mobile"));
+        }
       }
 
       // Remove os listeners após o primeiro toque
       window.removeEventListener("click", unlockAudio);
       window.removeEventListener("touchstart", unlockAudio);
+      window.removeEventListener("pointerdown", unlockAudio);
     };
 
     window.addEventListener("click", unlockAudio);
     window.addEventListener("touchstart", unlockAudio);
+    window.addEventListener("pointerdown", unlockAudio);
 
     return () => {
       window.removeEventListener("click", unlockAudio);
       window.removeEventListener("touchstart", unlockAudio);
+      window.removeEventListener("pointerdown", unlockAudio);
     };
-  }, [isMuted, volume]);
+  }, [isMuted]);
 
   // Fechar popover ao clicar fora
   useEffect(() => {
@@ -95,11 +105,8 @@ export default function App() {
     };
   }, []);
 
-  // Sincroniza áudio e SoundManager
+  // Sincroniza áudio e SoundManager (removido o audioRef.current.volume daqui)
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = isMuted ? 0 : volume;
-    }
     soundManager.setVolume(volume);
     localStorage.setItem("respconex_master_volume", volume.toString());
     localStorage.setItem("respconex_is_muted", isMuted ? "true" : "false");
@@ -109,11 +116,8 @@ export default function App() {
     const muted = soundManager.toggleMute();
     setIsMuted(muted);
     if (audioRef.current) {
-      audioRef.current.volume = muted ? 0 : volume;
-      if (!muted) {
+      if (!muted && audioRef.current.paused) {
         audioRef.current.play().catch(() => {});
-      } else {
-        audioRef.current.pause();
       }
     }
   };
@@ -121,23 +125,21 @@ export default function App() {
   const handleVolumeChange = (e) => {
     const newVol = parseFloat(e.target.value);
     setVolume(newVol);
-    soundManager.setVolume(newVol);
+    soundManager.setVolume(newVol); // O SoundManager gerencia o volume agora
 
     if (newVol > 0 && isMuted) {
       setIsMuted(false);
       soundManager.muted = false;
     }
-    if (audioRef.current) {
-      audioRef.current.volume = newVol;
-      if (newVol > 0) {
-        audioRef.current.play().catch(() => {});
-      }
+    if (audioRef.current && audioRef.current.paused && newVol > 0) {
+      audioRef.current.play().catch(() => {});
     }
   };
 
   return (
     <div className="app">
-      <audio ref={audioRef} src={BGM_URL} loop preload="auto" playsInline />
+      {/* ATENÇÃO: crossOrigin="anonymous" adicionado aqui */}
+      <audio ref={audioRef} crossOrigin="anonymous" src={BGM_URL} loop preload="auto" playsInline />
 
       {/* CONTROLE DE ÁUDIO RESPONSIVO */}
       <div
@@ -190,7 +192,7 @@ export default function App() {
             }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "0.75rem", color: "#94a3b8", fontWeight: "600" }}>Volume</span>
+              <span style={{ fontSize: "0.75rem", color: "#94a3b8", fontWeight: "600" }}>Volume Geral</span>
               <button
                 onClick={toggleMute}
                 style={{
