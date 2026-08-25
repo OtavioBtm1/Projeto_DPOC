@@ -147,8 +147,8 @@ export default function App() {
         ref={popoverRef}
         style={{
           position: "fixed",
-          // MÁGICA AQUI: Pega 12px de margem + o tamanho da Dynamic Island
-          top: "calc(12px + env(safe-area-inset-top))", 
+          // MÁGICA AQUI: Desce a ilha + espaço suficiente pra ficar na linha do TopBar
+          top: "calc(60px + env(safe-area-inset-top))", 
           right: "14px",
           zIndex: 9000,
         }}

@@ -7,10 +7,8 @@ export default function TopBar() {
     <div 
       className="topbar"
       style={{
-        // MÁGICA AQUI: Adiciona o tamanho exato da Ilha Dinâmica/Notch como margem interna superior
-        paddingTop: "calc(12px + env(safe-area-inset-top))",
-        // Evita que os itens fiquem espremidos no topo
-        minHeight: "calc(60px + env(safe-area-inset-top))"
+        position: "relative",
+        zIndex: 10
       }}
     >
       <div className="brand">

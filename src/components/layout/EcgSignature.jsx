@@ -26,7 +26,14 @@ export default function EcgSignature({ heartRate = "normal" }) {
   const isFlatline = heartRate === "flatline";
 
   return (
-    <div className={`ecg-wrap ${config.className}`} aria-hidden="true">
+    <div 
+      className={`ecg-wrap ${config.className}`} 
+      aria-hidden="true"
+      style={{
+        // MÁGICA AQUI: Desce o ECG exatamente o tamanho da Ilha Dinâmica da Apple
+        paddingTop: "env(safe-area-inset-top)"
+      }}
+    >
       <svg
         viewBox="0 0 600 46"
         preserveAspectRatio="none"
