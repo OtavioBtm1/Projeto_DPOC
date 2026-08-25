@@ -140,7 +140,7 @@ export default function App() {
   return (
     <div className="app">
       {/* ATENÇÃO: crossOrigin="anonymous" adicionado aqui */}
-      <audio ref={audioRef} crossOrigin="anonymous" src={BGM_URL} loop preload="auto" playsInline />
+      <audio ref={audioRef} src={BGM_URL} loop preload="auto" playsInline />
 
       {/* CONTROLE DE ÁUDIO RESPONSIVO */}
       <div
