@@ -14,6 +14,7 @@ import ProfileScreen from "./components/profile/ProfileScreen";
 import LibraryScreen from "./components/profile/LibraryScreen";
 import AchievementPopup from "./components/profile/AchievementPopup";
 import RankingScreen from "./components/ranking/RankingScreen";
+import musicaFundo from "./assets/musica.mp3"; 
 
 const SCREENS = {
   menu: MainMenu,
@@ -28,7 +29,7 @@ const SCREENS = {
   ranking: RankingScreen,
 };
 
-const BGM_URL = "/neonbumba-chill-gaming-music-relaxing-background-527562.mp3";
+const BGM_URL = musicaFundo;;
 export default function App() {
   const { screen, heartRate } = useGame();
   const ActiveScreen = SCREENS[screen] ?? MainMenu;
