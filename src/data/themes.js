@@ -4,243 +4,243 @@ export const THEME_TIERS = {
   easy: {
     id: "easy",
     title: "Nível Estudante",
-    subtitle: "Qualidade de vida, alimentação e clima",
+    subtitle: "Sintomas, clima e o dia a dia do paciente",
     color: "var(--mint)",
   },
   medium: {
     id: "medium",
     title: "Nível Enfermeiro",
-    subtitle: "Reabilitação, dispositivos e alertas ambientais",
+    subtitle: "Reabilitação, prevenção e monitoramento",
     color: "var(--gold)",
   },
   hard: {
     id: "hard",
     title: "Nível Professor",
-    subtitle: "Comorbidades sistêmicas e exacerbações climáticas",
+    subtitle: "Avaliação clínica, emergência e exacerbações",
     color: "var(--coral)",
   },
 };
 
 export const THEMES = [
   // ==========================================
-  // 🟢 FÁCIL (Temporada 2)
+  // 🟢 FÁCIL (5 Níveis - Foco Prático e Paciente)
   // ==========================================
   {
     id: "easy-1",
     tier: "easy",
     levelNumber: 1,
-    title: "Fase 1: Nutrição e Respiração",
-    subtitle: "O impacto do prato nos pulmões",
-    icon: "activity",
+    title: "Fase 1: Conhecendo o Inimigo",
+    subtitle: "Desmistificação e Sinais de Alerta",
+    icon: "users",
     groups: [
-      { name: "Alimentos a Evitar", color: "var(--gold)", items: ["Refrigerantes", "Feijão em excesso", "Frituras", "Repolho"], didYouKnow: "Alimentos que produzem muitos gases estufam o estômago, empurrando o diafragma e piorando a falta de ar." },
-      { name: "Bons Hábitos à Mesa", color: "var(--mint)", items: ["Comer devagar", "Mastigar bem", "Porções pequenas", "Sentar-se ereto"], didYouKnow: "Fazer refeições menores e mais frequentes exige menos energia e oxigênio para a digestão." },
-      { name: "Nutrientes Aliados", color: "var(--sky)", items: ["Fibras", "Vitamina C", "Ômega-3", "Proteínas magras"], didYouKnow: "Uma dieta rica em proteínas ajuda a manter a massa muscular, essencial para a força da respiração." },
-      { name: "Hidratação", color: "var(--violet)", items: ["Beber água aos poucos", "Evitar líquidos na refeição", "Sucos naturais", "Água de coco"], didYouKnow: "Beber líquidos longe das refeições principais evita a sensação de estômago cheio demais." }
+      { name: "Sintomas Iniciais", color: "var(--gold)", items: ["Falta de ar", "Tosse crônica", "Fadiga diária", "Chiado no peito"], didYouKnow: "Muitos pacientes acham que o cansaço é 'só velhice', o que atrasa o diagnóstico em vários anos." },
+      { name: "Desmistificando a DPOC", color: "var(--mint)", items: ["Não é contagiosa", "Tem tratamento", "Exige movimento", "Não é só cigarro"], didYouKnow: "Embora o fumo seja a principal causa, a inalação de fumaça de fogão a lenha e poluição também causam DPOC grave." },
+      { name: "Primeiros Passos", color: "var(--sky)", items: ["Buscar médico", "Fazer espirometria", "Parar de fumar", "Mudar hábitos"], didYouKnow: "A espirometria (exame do sopro) é o único teste definitivo para diagnosticar o nível de obstrução pulmonar." },
+      { name: "Mitos Comuns", color: "var(--violet)", items: ["Bombinha vicia", "Oxigênio vicia", "Repouso absoluto", "Não tem cura"], didYouKnow: "Bombinhas não viciam! Elas entregam o remédio direto no pulmão, com muito menos efeitos colaterais que um comprimido." }
     ],
   },
   {
     id: "easy-2",
     tier: "easy",
     levelNumber: 2,
-    title: "Fase 2: O Sono do Paciente",
-    subtitle: "Descansar para conseguir respirar",
-    icon: "users",
+    title: "Fase 2: Clima e Ar Seco",
+    subtitle: "Impactos climáticos e prevenção sazonal",
+    icon: "sun",
     groups: [
-      { name: "Problemas Noturnos", color: "var(--gold)", items: ["Insônia", "Ronco alto", "Despertar ofegante", "Dor de cabeça matinal"], didYouKnow: "A dor de cabeça ao acordar pode ser sinal de acúmulo de gás carbônico (CO2) durante a noite." },
-      { name: "Higiene do Sono", color: "var(--mint)", items: ["Quarto escuro", "Horário regular", "Evitar telas", "Refeição leve à noite"], didYouKnow: "A luz de celulares antes de dormir inibe a melatonina, piorando a insônia comum na DPOC." },
-      { name: "Posições Confortáveis", color: "var(--sky)", items: ["Travesseiros altos", "Dormir de lado", "Cabeceira elevada", "Apoio nos joelhos"], didYouKnow: "Elevar a cabeceira da cama diminui a pressão dos órgãos abdominais sobre os pulmões." },
-      { name: "Riscos Adicionais", color: "var(--violet)", items: ["Apneia do sono", "Uso de calmantes", "Falta de oxigênio", "Refluxo"], didYouKnow: "Calmantes e remédios para dormir sem orientação médica podem deprimir perigosamente a respiração." }
+      { name: "El Niño e Seca", color: "var(--gold)", items: ["Tempo abafado", "Falta de chuvas", "Baixa umidade", "Muco grosso"], didYouKnow: "O ar muito seco engrossa a secreção, dificultando a tosse e favorecendo infecções bacterianas graves." },
+      { name: "Queimadas e Fuligem", color: "var(--mint)", items: ["Fumaça no ar", "Irritação ocular", "Gatilho de crise", "Fuligem invisível"], didYouKnow: "As partículas finas das queimadas viajam quilômetros, atravessam as defesas do nariz e inflamam violentamente os brônquios." },
+      { name: "Ondas de Calor", color: "var(--sky)", items: ["Suor excessivo", "Queda de pressão", "Cansaço térmico", "Desidratação"], didYouKnow: "O corpo gasta muita energia para tentar se resfriar no calor intenso, exigindo mais do coração e 'roubando' oxigênio." },
+      { name: "Prevenção Sazonal", color: "var(--violet)", items: ["Lavar o nariz", "Umidificador", "Ficar na sombra", "Beber água"], didYouKnow: "Lavar o nariz com soro funciona como um 'filtro' extra, retirando a poluição antes dela descer para os pulmões." }
     ],
   },
   {
     id: "easy-3",
     tier: "easy",
     levelNumber: 3,
-    title: "Fase 3: Movimento e Exercício",
-    subtitle: "Atividade física como remédio",
+    title: "Fase 3: Arsenal Inalatório",
+    subtitle: "Técnica do uso da bombinha sem erros",
     icon: "activity",
     groups: [
-      { name: "Exercícios Seguros", color: "var(--gold)", items: ["Caminhada leve", "Alongamento", "Bicicleta ergométrica", "Hidroginástica"], didYouKnow: "O sedentarismo atrofia os músculos; caminhar melhora a eficiência com que o corpo usa o oxigênio." },
-      { name: "Sinais para Parar", color: "var(--mint)", items: ["Tontura", "Dor no peito", "Falta de ar extrema", "Palpitação forte"], didYouKnow: "Sentir um pouco de cansaço é normal, mas dor no peito exige interrupção imediata da atividade." },
-      { name: "Preparo para a Atividade", color: "var(--sky)", items: ["Usar a bombinha antes", "Roupas confortáveis", "Tênis adequado", "Aquecimento"], didYouKnow: "Usar o broncodilatador 15 minutos antes do exercício ajuda a prevenir o cansaço precoce." },
-      { name: "Respiração no Esforço", color: "var(--violet)", items: ["Inspirar parado", "Expirar no movimento", "Ritmo constante", "Pausas regulares"], didYouKnow: "Sincronizar a respiração com o passo (ex: puxar o ar em 1 passo, soltar em 2) facilita a caminhada." }
+      { name: "Tipos de Dispositivos", color: "var(--gold)", items: ["Spray (Bombinha)", "Cápsula de pó", "Névoa suave", "Espaçador"], didYouKnow: "O espaçador é recomendado para adultos e idosos, pois garante que o remédio chegue no pulmão e não fique preso na garganta." },
+      { name: "Uso Sem Erros", color: "var(--mint)", items: ["Agitar o frasco", "Soltar todo o ar", "Puxar e apertar", "Prender respiração"], didYouKnow: "Segurar a respiração por 10 segundos após inalar é o segredo vital para o pó assentar e fazer efeito." },
+      { name: "Erros Mais Comuns", color: "var(--sky)", items: ["Esquecer de agitar", "Não usar espaçador", "Respirar rápido", "Vazamento no bocal"], didYouKnow: "Inspirar rápido demais faz o remédio bater no fundo da garganta. O ideal é puxar o ar de forma lenta e profunda." },
+      { name: "Higiene do Material", color: "var(--violet)", items: ["Lavar espaçador", "Secar à sombra", "Limpar bocal", "Checar validade"], didYouKnow: "Esfregar o espaçador por dentro com pano cria energia estática, fazendo o remédio grudar nas paredes de plástico." }
     ],
   },
   {
     id: "easy-4",
     tier: "easy",
     levelNumber: 4,
-    title: "Fase 4: Saúde Mental",
-    subtitle: "O peso invisível da DPOC",
+    title: "Fase 4: Rotina e Movimento",
+    subtitle: "Exercício, nutrição e riscos em casa",
     icon: "users",
     groups: [
-      { name: "Desafios Emocionais", color: "var(--gold)", items: ["Tristeza", "Isolamento social", "Medo de sufocar", "Vergonha da tosse"], didYouKnow: "O isolamento social é comum, pois o paciente teme ter crises de tosse ou falta de ar em público." },
-      { name: "O Ciclo da Ansiedade", color: "var(--mint)", items: ["Falta de ar gera pânico", "Pânico acelera respiração", "Respiração rápida cansa", "Piora da falta de ar"], didYouKnow: "A ansiedade tensiona a musculatura do tórax, tornando a respiração ainda mais difícil e superficial." },
-      { name: "Rede de Apoio", color: "var(--sky)", items: ["Família presente", "Grupos de pacientes", "Terapia", "Visitas regulares"], didYouKnow: "Compartilhar medos com quem tem a mesma doença em grupos de apoio reduz significativamente a depressão." },
-      { name: "Relaxamento", color: "var(--violet)", items: ["Ouvir música", "Leitura", "Meditação guiada", "Trabalhos manuais"], didYouKnow: "Técnicas de relaxamento diminuem a frequência cardíaca e ajudam a controlar crises de ansiedade leve." }
+      { name: "Movimento e Exercício", color: "var(--gold)", items: ["Caminhada leve", "Alongamento", "Pausas regulares", "Conservar energia"], didYouKnow: "Sincronizar a respiração com o passo (ex: puxar o ar em 1 passo, soltar em 2) facilita incrivelmente a caminhada." },
+      { name: "Apoio Nutricional", color: "var(--mint)", items: ["Comer devagar", "Porções pequenas", "Evitar gases", "Mastigar bem"], didYouKnow: "Alimentos que produzem gases estufam o estômago, empurrando o diafragma para cima e piorando a falta de ar." },
+      { name: "Descanso do Paciente", color: "var(--sky)", items: ["Travesseiro alto", "Quarto escuro", "Elevar cabeceira", "Higiene do sono"], didYouKnow: "Elevar a cabeceira da cama diminui a pressão dos órgãos abdominais sobre os pulmões durante a noite." },
+      { name: "Riscos Ocultos no Ambiente", color: "var(--violet)", items: ["Ácaros e mofo", "Cloro de limpeza", "Fumaça de fritura", "Pelos de animais"], didYouKnow: "Inalar produtos de limpeza com cheiro muito forte, como água sanitária pura, pode causar broncoespasmo imediato." }
     ],
   },
   {
     id: "easy-5",
     tier: "easy",
     levelNumber: 5,
-    title: "Fase 5: O Impacto do El Niño",
-    subtitle: "Clima extremo e seus perigos",
-    icon: "sun",
+    title: "Fase 5: Saúde Mental",
+    subtitle: "O ciclo da dispneia e o apoio emocional",
+    icon: "shield",
     groups: [
-      { name: "O Fenômeno Climático", color: "var(--gold)", items: ["Seca prolongada", "Ondas de calor", "Ar muito seco", "Falta de chuvas"], didYouKnow: "O El Niño eleva as temperaturas globais, tornando o ar extremamente seco, o que dificulta a respiração na DPOC." },
-      { name: "Adaptação da Rotina", color: "var(--mint)", items: ["Evitar sol do meio-dia", "Roupas leves", "Ficar na sombra", "Exercício só de manhã"], didYouKnow: "O esforço físico no pico do calor aumenta a demanda de oxigênio pelo corpo, gerando cansaço rápido." },
-      { name: "Sinais de Alerta no Calor", color: "var(--sky)", items: ["Boca muito seca", "Catarro espesso", "Cansaço extremo", "Tontura térmica"], didYouKnow: "A desidratação faz o muco pulmonar engrossar, dificultando a sua eliminação." },
-      { name: "Aliados da Hidratação", color: "var(--violet)", items: ["Beber mais água", "Uso de umidificador", "Bacia com água no quarto", "Toalha úmida"], didYouKnow: "Umidificar o ambiente ajuda a manter as vias aéreas lubrificadas durante os dias secos." }
+      { name: "Impacto Emocional", color: "var(--gold)", items: ["Tristeza", "Isolamento social", "Medo de sufocar", "Ansiedade diária"], didYouKnow: "O isolamento social é comum, pois o paciente teme ter crises de tosse severa ou falta de ar em público." },
+      { name: "Ciclo da Dispneia", color: "var(--mint)", items: ["Falta de ar", "Gera pânico", "Acelera respiração", "Cansa o músculo"], didYouKnow: "O pânico tensiona a musculatura do tórax, tornando a respiração ainda mais superficial, rápida e difícil." },
+      { name: "Rede de Apoio", color: "var(--sky)", items: ["Família presente", "Grupos de pacientes", "Terapia", "Conversar abertamente"], didYouKnow: "Compartilhar medos com quem tem a mesma doença em grupos de apoio reduz significativamente as taxas de depressão." },
+      { name: "Técnicas de Relaxamento", color: "var(--violet)", items: ["Respiração lenta", "Meditação", "Ouvir música", "Leitura"], didYouKnow: "Praticar o relaxamento diminui a frequência cardíaca e ajuda a retomar o controle respiratório em crises leves." }
     ],
   },
 
   // ==========================================
-  // 🟡 MÉDIO (Temporada 2)
+  // 🟡 MÉDIO (5 Níveis - Foco Cuidador e Enfermagem Básica)
   // ==========================================
   {
     id: "medium-1",
     tier: "medium",
     levelNumber: 1,
-    title: "Fase 1: Reabilitação Pulmonar",
-    subtitle: "Recuperando a independência",
+    title: "Fase 6: Reabilitação Pulmonar",
+    subtitle: "Condicionamento e equipe multidisciplinar",
     icon: "activity",
     groups: [
-      { name: "Objetivos do Programa", color: "var(--gold)", items: ["Reduzir sintomas", "Melhorar esforço", "Educação em saúde", "Independência"], didYouKnow: "A reabilitação não reverte a lesão pulmonar, mas ensina o corpo a aproveitar melhor o oxigênio disponível." },
-      { name: "Equipe Multidisciplinar", color: "var(--mint)", items: ["Fisioterapeuta", "Nutricionista", "Psicólogo", "Enfermeiro"], didYouKnow: "O sucesso da reabilitação depende da ação conjunta de diversos profissionais da saúde." },
-      { name: "Treino Muscular", color: "var(--sky)", items: ["Força de membros", "Treino de resistência", "Halteres leves", "Faixas elásticas"], didYouKnow: "Fortalecer os braços ajuda muito, pois usamos músculos acessórios do tórax para levantar peso e respirar ao mesmo tempo." },
-      { name: "Resultados Esperados", color: "var(--violet)", items: ["Menos internações", "Caminhar mais longe", "Melhora do humor", "Volta ao trabalho"], didYouKnow: "Pacientes reabilitados apresentam uma drástica redução nas idas à emergência." }
+      { name: "Objetivos", color: "var(--gold)", items: ["Reduzir sintomas", "Melhorar esforço", "Independência", "Educação em saúde"], didYouKnow: "A reabilitação não reverte a lesão pulmonar, mas ensina os músculos a aproveitar melhor o oxigênio disponível." },
+      { name: "Treino Físico", color: "var(--mint)", items: ["Força de membros", "Exercício aeróbico", "Halteres leves", "Faixas elásticas"], didYouKnow: "Fortalecer os braços ajuda muito, pois pacientes usam a musculatura acessória para levantar peso e respirar ao mesmo tempo." },
+      { name: "Equipe Multidisciplinar", color: "var(--sky)", items: ["Fisioterapeuta", "Nutricionista", "Psicólogo", "Enfermeiro"], didYouKnow: "O sucesso a longo prazo na reabilitação depende de ajustar tanto o corpo quanto a mente e a dieta do paciente." },
+      { name: "Padrão Respiratório", color: "var(--violet)", items: ["Freno labial", "Uso do diafragma", "Ritmo constante", "Expirar longo"], didYouKnow: "A respiração com freio labial (bico) cria uma pressão que mantém os brônquios abertos por mais tempo na expiração." }
     ],
   },
   {
     id: "medium-2",
     tier: "medium",
     levelNumber: 2,
-    title: "Fase 2: Tecnologia e Dispositivos",
-    subtitle: "Ferramentas de monitoramento",
+    title: "Fase 7: Sinais de Alerta",
+    subtitle: "Atenção à crise e monitoramento em casa",
     icon: "shield",
     groups: [
-      { name: "Oxímetro de Pulso", color: "var(--gold)", items: ["Dedo indicador", "Sem esmalte escuro", "Mãos aquecidas", "Leitura de SpO2"], didYouKnow: "Esmaltes escuros ou mãos muito frias podem causar falsas leituras baixas de oxigênio no aparelho." },
-      { name: "Saturação Alvo", color: "var(--mint)", items: ["Geralmente 88% a 92%", "Evitar excesso de O2", "Aceitar valores menores", "Monitorar tendências"], didYouKnow: "Na DPOC grave, saturar 100% não é o objetivo e pode até ser perigoso, inibindo o estímulo da respiração." },
-      { name: "Espaçadores Modernos", color: "var(--sky)", items: ["Válvula unidirecional", "Máscara acoplada", "Antiestáticos", "Alarme de fluxo"], didYouKnow: "Alguns espaçadores apitam se o paciente inspirar rápido demais, ajudando a corrigir a técnica." },
-      { name: "Concentradores de O2", color: "var(--violet)", items: ["Filtro limpo", "Distância de chamas", "Uso contínuo", "Extensão de cânula"], didYouKnow: "Concentradores portáteis deram liberdade de locomoção aos pacientes dependentes de oxigenoterapia." }
+      { name: "Atenção à Crise", color: "var(--gold)", items: ["Catarro amarelado", "Febre inesperada", "Falta de ar severa", "Confusão mental"], didYouKnow: "Se o catarro mudar de cor (para amarelo ou verde) ou aumentar de volume, é forte indício de infecção pulmonar." },
+      { name: "Monitoramento", color: "var(--mint)", items: ["Oxímetro de pulso", "Pressão arterial", "Controle de peso", "Frequência cardíaca"], didYouKnow: "No oxímetro, esmaltes escuros ou mãos muito frias podem causar falsas leituras baixas de oxigênio." },
+      { name: "Prevenção de Infecções", color: "var(--sky)", items: ["Vacina da gripe", "Uso de máscara", "Higiene das mãos", "Saúde bucal"], didYouKnow: "Bactérias escondidas em gengivites mal curadas podem ser aspiradas para o pulmão e causar pneumonias graves." },
+      { name: "Autocuidado", color: "var(--violet)", items: ["Plano de ação", "Adesão correta", "Reconhecer piora", "Contato de urgência"], didYouKnow: "Ter um plano de ação escrito ajuda o paciente a saber exatamente quantos jatos a mais de remédio tomar antes de ir ao PS." }
     ],
   },
   {
     id: "medium-3",
     tier: "medium",
     levelNumber: 3,
-    title: "Fase 3: Prevenção de Infecções",
-    subtitle: "A defesa da barreira respiratória",
-    icon: "shield",
+    title: "Fase 8: Papel da Enfermagem",
+    subtitle: "Acompanhamento e intervenção domiciliar",
+    icon: "users",
     groups: [
-      { name: "Ameaças Invisíveis", color: "var(--gold)", items: ["Vírus da gripe", "Bactérias", "Fungos de mofo", "Aglomerações"], didYouKnow: "Um simples resfriado em uma pessoa saudável pode virar uma pneumonia grave no paciente com DPOC." },
-      { name: "Cuidados Odontológicos", color: "var(--mint)", items: ["Escovar dentes", "Fio dental", "Ir ao dentista", "Limpar próteses"], didYouKnow: "Bactérias de gengivites podem ser aspiradas para os pulmões, causando infecções graves." },
-      { name: "Barreiras Físicas", color: "var(--sky)", items: ["Uso de máscara", "Álcool em gel", "Distanciamento", "Ventilação natural"], didYouKnow: "Manter a casa arejada dispersa gotículas e reduz a carga viral do ambiente." },
-      { name: "Vacinação Específica", color: "var(--violet)", items: ["Tríplice bacteriana (dTpa)", "Hepatite B", "Herpes Zóster", "Reforços em dia"], didYouKnow: "Além das vacinas respiratórias, a vacina contra Herpes Zóster é recomendada devido à baixa imunidade natural da idade." }
+      { name: "Consulta de Rotina", color: "var(--gold)", items: ["Checar inalação", "Revisar vacinas", "Avaliar sintomas", "Acolhimento"], didYouKnow: "A maior causa de falha no tratamento é o uso incorreto da bombinha, que deve ser reavaliado em toda consulta." },
+      { name: "Intervenção Básica", color: "var(--mint)", items: ["Decúbito elevado", "Oxigênio prescrito", "Orientar tosse", "Hidratação oral"], didYouKnow: "Ensinar a 'tosse eficaz' (tossir de forma curta e controlada) evita o colapso das vias aéreas e gasta menos energia." },
+      { name: "Busca Ativa", color: "var(--sky)", items: ["Visita domiciliar", "Telefonemas", "Evitar internação", "Monitorar faltas"], didYouKnow: "O acompanhamento próximo por enfermeiros e agentes de saúde reduz as idas à emergência em mais de 40%." },
+      { name: "Educação em Saúde", color: "var(--violet)", items: ["Cartilhas visuais", "Linguagem simples", "Checar entendimento", "Envolver família"], didYouKnow: "O letramento em saúde é vital: pedir para o paciente repetir a orientação garante que ele realmente compreendeu." }
     ],
   },
   {
     id: "medium-4",
     tier: "medium",
     levelNumber: 4,
-    title: "Fase 4: O Papel da Enfermagem",
-    subtitle: "Acompanhamento longitudinal",
-    icon: "users",
+    title: "Fase 9: Meio Ambiente Intenso",
+    subtitle: "Inversão térmica e poluição indoor",
+    icon: "wind",
     groups: [
-      { name: "Consultas de Rotina", color: "var(--gold)", items: ["Revisar inalação", "Checar vacinas", "Avaliar adesão", "Medir pressão"], didYouKnow: "A consulta de enfermagem foca na educação contínua e em corrigir vícios no uso dos medicamentos." },
-      { name: "Busca Ativa", color: "var(--mint)", items: ["Visita domiciliar", "Telefonemas", "Faltas em consulta", "Rastreio de piora"], didYouKnow: "Agentes comunitários e enfermeiros evitam internações ao detectar sinais precoces de exacerbação em casa." },
-      { name: "Plano de Cuidados", color: "var(--sky)", items: ["Metas realistas", "Diário de sintomas", "Orientações escritas", "Contato de urgência"], didYouKnow: "As orientações devem ser escritas com letras grandes e linguagem simples para facilitar a leitura por idosos." },
-      { name: "Triagem no Acolhimento", color: "var(--violet)", items: ["Frequência respiratória", "Sinais de cianose", "Uso de musculatura", "Confusão mental"], didYouKnow: "Um paciente usando a musculatura do pescoço (escalenos) para respirar precisa de atendimento prioritário." }
+      { name: "Inversão Térmica", color: "var(--gold)", items: ["Ar frio retido", "Poluentes no solo", "Piora matinal", "Risco de crise"], didYouKnow: "A inversão térmica no inverno age como uma 'tampa', prendendo a fumaça dos escapamentos na altura da nossa respiração." },
+      { name: "Poluição Interna (Indoor)", color: "var(--mint)", items: ["Fogão a lenha", "Querosene", "Uso de incensos", "Falta de ventilação"], didYouKnow: "A fumaça crônica de fogões a lenha em ambientes fechados é uma das maiores causas de DPOC em mulheres no interior." },
+      { name: "Cuidados no Frio", color: "var(--sky)", items: ["Cachecol no rosto", "Aquecer o ar", "Evitar friagem", "Roupas em camadas"], didYouKnow: "Respirar ar gelado de uma vez causa broncoespasmo (fechamento dos brônquios). O cachecol ajuda a aquecer o ar." },
+      { name: "Impacto nos Remédios", color: "var(--violet)", items: ["Longe do calor", "Não expor ao sol", "Manter fechado", "Checar validade"], didYouKnow: "Bombinhas pressurizadas expostas ao sol intenso do El Niño podem sofrer alteração na dose disparada." }
     ],
   },
   {
     id: "medium-5",
     tier: "medium",
     levelNumber: 5,
-    title: "Fase 5: Riscos Ambientais e Poluição",
-    subtitle: "Alerta Climático e El Niño",
-    icon: "wind",
+    title: "Fase 10: Vivência Sistêmica",
+    subtitle: "As consequências além do pulmão",
+    icon: "alert-triangle",
     groups: [
-      { name: "Inversão Térmica", color: "var(--gold)", items: ["Bloqueio de ar frio", "Retenção de poluentes", "Qualidade do ar ruim", "Risco de broncoespasmo"], didYouKnow: "A inversão térmica age como uma 'tampa', prendendo a poluição perto do solo." },
-      { name: "Fumaça e Queimadas", color: "var(--mint)", items: ["Inalação de fuligem", "Irritação brônquica", "Fechar janelas", "Uso de máscara PFF2"], didYouKnow: "Durante secas do El Niño, as queimadas aumentam e o uso de máscara PFF2 ao sair filtra a fuligem fina." },
-      { name: "Cuidados Preventivos", color: "var(--sky)", items: ["Monitorar hidratação", "Lavagem nasal com soro", "Ajustar banho", "Identificar desidratação"], didYouKnow: "A lavagem nasal diária remove mecanicamente os poluentes presos na mucosa superior." },
-      { name: "Impacto nos Remédios", color: "var(--violet)", items: ["Ressecamento da mucosa", "Enxágue redobrado", "Longe do calor", "Checar validade"], didYouKnow: "Bombinhas não devem ser expostas ao sol; o calor extremo altera a pressão do gás e a dose." }
+      { name: "Desnutrição Grave", color: "var(--gold)", items: ["Caquexia pulmonar", "Gasto calórico", "Perda muscular", "Hipermetabolismo"], didYouKnow: "O esforço para respirar pesado o dia todo gasta tantas calorias que muitos pacientes emagrecem drasticamente." },
+      { name: "Coração e Pulmão", color: "var(--mint)", items: ["Arritmias", "Pressão pulmonar alta", "Cor Pulmonale", "Inchaço nas pernas"], didYouKnow: "Quando o pulmão adoece, o lado direito do coração faz muita força para bombear sangue para ele, podendo inchar (Cor Pulmonale)." },
+      { name: "Risco de Osteoporose", color: "var(--sky)", items: ["Uso de corticoide", "Risco de fratura", "Falta de sol", "Sedentarismo"], didYouKnow: "O uso prolongado de corticoides orais, somado à falta de exercícios, enfraquece severamente os ossos do paciente." },
+      { name: "Apneia do Sono", color: "var(--violet)", items: ["Ronco alto", "Despertares súbitos", "Falta de ar noturna", "Risco cardiovascular"], didYouKnow: "A sobreposição de DPOC com Apneia (Síndrome de Overlap) despenca os níveis de oxigênio durante a madrugada." }
     ],
   },
 
   // ==========================================
-  // 🔴 DIFÍCIL (Temporada 2)
+  // 🔴 DIFÍCIL (5 Níveis - Foco Clínico e Emergência)
   // ==========================================
   {
     id: "hard-1",
     tier: "hard",
     levelNumber: 1,
-    title: "Fase 1: Interações e Farmacologia",
-    subtitle: "Complexidade medicamentosa",
-    icon: "pill",
+    title: "Fase 11: Avaliação Física",
+    subtitle: "O exame clínico respiratório avançado",
+    icon: "chart",
     groups: [
-      { name: "Betabloqueadores", color: "var(--gold)", items: ["Usados na pressão", "Cardiosseletivos", "Risco de broncoespasmo", "Atenolol / Bisoprolol"], didYouKnow: "Pacientes com DPOC e problema cardíaco devem usar apenas betabloqueadores específicos (cardiosseletivos) para não fechar os brônquios." },
-      { name: "Uso de Corticoides", color: "var(--mint)", items: ["Osteoporose", "Catarata", "Diabetes induzida", "Pele frágil"], didYouKnow: "O uso prolongado de corticoide em comprimido afina a pele, descalcifica ossos e desregula o açúcar no sangue." },
-      { name: "Diuréticos", color: "var(--sky)", items: ["Perda de potássio", "Alcalose metabólica", "Fraqueza muscular", "Arritmias"], didYouKnow: "Diuréticos usados para inchaço nas pernas podem eliminar potássio demais, gerando fraqueza nos músculos da respiração." },
-      { name: "Antibioticoterapia", color: "var(--violet)", items: ["Macrolídeos", "Azitromicina contínua", "Efeito imunomodulador", "Resistência bacteriana"], didYouKnow: "A Azitromicina não é usada apenas para matar bactérias, mas por seu forte efeito anti-inflamatório nos pulmões." }
+      { name: "Inspeção", color: "var(--gold)", items: ["Tórax em barril", "Tiragem intercostal", "Cianose central", "Baqueteamento digital"], didYouKnow: "O 'tórax em barril' surge porque o paciente não consegue expirar todo o ar, deixando os pulmões hiperinsuflados cronicamente." },
+      { name: "Ausculta Pulmonar", color: "var(--mint)", items: ["Murmúrio reduzido", "Sibilos expiratórios", "Estertores", "Tempo expiratório longo"], didYouKnow: "O silêncio na ausculta pulmonar durante uma crise pode ser um péssimo sinal: indica que quase não há passagem de ar." },
+      { name: "Percussão e Palpação", color: "var(--sky)", items: ["Hipersonoridade", "Frêmito diminuído", "Expansibilidade baixa", "Baixa excursão base"], didYouKnow: "Ao percutir o tórax, ouve-se um som mais oco (hipersonoro) devido à enorme quantidade de ar aprisionado." },
+      { name: "Sinais de Gravidade", color: "var(--violet)", items: ["Uso de escalenos", "Respiração paradoxal", "Confusão mental", "Letargia"], didYouKnow: "A respiração paradoxal (a barriga murcha em vez de estufar ao inspirar) indica falência iminente do músculo diafragma." }
     ],
   },
   {
     id: "hard-2",
     tier: "hard",
     levelNumber: 2,
-    title: "Fase 2: Consequências Sistêmicas",
-    subtitle: "Muito além dos pulmões",
-    icon: "alert-triangle",
+    title: "Fase 12: Fármacos Utilizados",
+    subtitle: "Farmacologia respiratória e oxigenoterapia",
+    icon: "pill",
     groups: [
-      { name: "Disfunção Muscular", color: "var(--gold)", items: ["Sarcopenia", "Fibras de contração rápida", "Atrofia por desuso", "Fadiga láctica"], didYouKnow: "A DPOC altera as fibras musculares das pernas, fazendo o paciente produzir ácido lático e cansar muito mais rápido." },
-      { name: "Policitemia Secundária", color: "var(--mint)", items: ["Aumento de hemácias", "Sangue viscoso", "Hipóxia crônica", "Risco de trombose"], didYouKnow: "O corpo produz glóbulos vermelhos em excesso tentando compensar a falta de oxigênio, deixando o sangue 'grosso'." },
-      { name: "Desnutrição Grave", color: "var(--sky)", items: ["Caquexia pulmonar", "Perda de massa magra", "Alto gasto energético", "Hipermetabolismo"], didYouKnow: "O trabalho de respirar pesado gasta tantas calorias que muitos pacientes emagrecem drasticamente mesmo comendo bem." },
-      { name: "Doença Cardiovascular", color: "var(--violet)", items: ["Isquemia miocárdica", "Fibrilação atrial", "Cor Pulmonale", "Rigidez arterial"], didYouKnow: "A inflamação crônica nos pulmões viaja pelo sangue e danifica diretamente as artérias do coração." }
+      { name: "Broncodilatadores", color: "var(--gold)", items: ["SABA e LABA", "SAMA e LAMA", "Receptor Beta-2", "Relaxamento muscular"], didYouKnow: "SABA/LABA estimulam os receptores que relaxam o brônquio, enquanto SAMA/LAMA bloqueiam os receptores que causam contração." },
+      { name: "Corticoides", color: "var(--mint)", items: ["Anti-inflamatório", "ICS, Oral e IV", "Efeitos sistêmicos", "Risco de candidíase"], didYouKnow: "Após inalar corticoide (ICS), é obrigatório lavar a boca. O resíduo imunossuprime a mucosa e causa fungos (sapinho)." },
+      { name: "Antibioticoterapia", color: "var(--sky)", items: ["Exacerbação purulenta", "Macrolídeos", "Efeito imunomodulador", "Prevenir resistência"], didYouKnow: "Macrolídeos como a azitromicina contínua são usados não só para matar bactérias, mas por seu forte efeito anti-inflamatório." },
+      { name: "Oxigenoterapia", color: "var(--violet)", items: ["O2 domiciliar", "Cânula nasal", "Concentrador", "Saturação 88-92%"], didYouKnow: "Para retentores crônicos, a saturação alvo é de 88% a 92%. Mais que isso pode desligar o estímulo cerebral para respirar." }
     ],
   },
   {
     id: "hard-3",
     tier: "hard",
     levelNumber: 3,
-    title: "Fase 3: Gasometria e Distúrbios",
-    subtitle: "A química do sangue no paciente",
-    icon: "chart",
+    title: "Fase 13: Gasometria e Distúrbios",
+    subtitle: "Desvendando o sangue arterial",
+    icon: "activity",
     groups: [
-      { name: "Retenção de CO2", color: "var(--gold)", items: ["Hipercapnia crônica", "Sonolência", "Cefaleia", "Tremor de extremidades"], didYouKnow: "Níveis altos de CO2 atuam como um anestésico no cérebro, causando confusão e letargia." },
-      { name: "Acidose Respiratória", color: "var(--mint)", items: ["pH < 7.35", "PaCO2 > 45", "Fadiga diafragmática", "Emergência médica"], didYouKnow: "A acidose indica que o pulmão entrou em falência mecânica e não consegue mais jogar o gás carbônico para fora." },
-      { name: "Compensação Renal", color: "var(--sky)", items: ["Retenção de Bicarbonato", "pH normalizado", "Base Excess alta", "Processo lento"], didYouKnow: "Os rins demoram até 3 dias para reter bicarbonato suficiente e equilibrar a acidez do sangue." },
-      { name: "Toxicidade por Oxigênio", color: "var(--violet)", items: ["Efeito Haldane", "Perda do drive hipóxico", "Piora da hipercapnia", "Narcose"], didYouKnow: "Dar muito oxigênio para um paciente retentor de CO2 pode fazer ele parar de respirar por conta própria." }
+      { name: "Hipoxemia", color: "var(--gold)", items: ["PaO2 baixa", "Saturação < 88%", "Cianose", "Sofrimento tecidual"], didYouKnow: "Uma PaO2 (pressão de oxigênio no sangue) abaixo de 60 mmHg em repouso é indicação de oxigênio domiciliar contínuo." },
+      { name: "Hipercapnia", color: "var(--mint)", items: ["Retenção de CO2", "PaCO2 > 45", "Narcose por CO2", "Sonolência diurna"], didYouKnow: "Níveis extremamente altos de Gás Carbônico agem no cérebro como um anestésico, levando o paciente ao coma." },
+      { name: "Acidose Respiratória", color: "var(--sky)", items: ["pH < 7.35", "Falência mecânica", "Fadiga diafragmática", "Emergência médica"], didYouKnow: "Quando o pulmão exausto não joga o CO2 fora, ele vira ácido no sangue, derrubando o pH. É indicativo de suporte ventilatório." },
+      { name: "Compensação Renal", color: "var(--violet)", items: ["Reter bicarbonato", "Base Excess alta", "Processo lento", "pH crônico normal"], didYouKnow: "O rim é o parceiro do pulmão. Se o pulmão está ácido (alto CO2), o rim retém base (bicarbonato) para neutralizar o sangue." }
     ],
   },
   {
     id: "hard-4",
     tier: "hard",
     levelNumber: 4,
-    title: "Fase 4: Cuidados Paliativos",
-    subtitle: "Dignidade e conforto avançado",
-    icon: "users",
+    title: "Fase 14: Exacerbações Extremas",
+    subtitle: "Estresse climático e descompensação",
+    icon: "wind",
     groups: [
-      { name: "Foco do Cuidado", color: "var(--gold)", items: ["Alívio do sofrimento", "Conforto", "Qualidade de vida", "Apoio espiritual"], didYouKnow: "Os cuidados paliativos não significam 'desistir', mas sim garantir a melhor qualidade de vida na fase avançada." },
-      { name: "Manejo da Dispneia", color: "var(--mint)", items: ["Opioides (Morfina)", "Ventilador no rosto", "Posição sentada", "Ambiente fresco"], didYouKnow: "Morfina em baixas doses diminui a percepção de falta de ar no cérebro sem causar parada respiratória." },
-      { name: "Ansiedade de Fim de Vida", color: "var(--sky)", items: ["Medo da asfixia", "Apoio psicológico", "Uso de benzodiazepínicos", "Presença familiar"], didYouKnow: "O pânico constante de sufocar exige manejo farmacológico delicado associado a forte apoio humano." },
-      { name: "Diretivas Antecipadas", color: "var(--violet)", items: ["Testamento vital", "Decisão sobre intubação", "Vontade do paciente", "Conferência familiar"], didYouKnow: "Permitir que o paciente decida antecipadamente se deseja ou não ir para a UTI garante autonomia e dignidade." }
+      { name: "Estresse Térmico", color: "var(--gold)", items: ["Vasodilatação", "Aumento do débito", "Sobrecarga cardíaca", "Risco de choque"], didYouKnow: "Ondas de calor severas forçam o coração a bombear muito sangue para a pele tentar resfriar, esgotando a reserva do paciente." },
+      { name: "Partículas PM2.5", color: "var(--mint)", items: ["Penetração alveolar", "Estresse oxidativo", "Inflamação sistêmica", "Microtrombose"], didYouKnow: "Fuligens muito finas (menores que 2.5 micrômetros) atravessam o pulmão, caem na corrente sanguínea e inflamam os vasos." },
+      { name: "Manejo no Pronto-Socorro", color: "var(--sky)", items: ["Reposição venosa", "Cuidado com edema", "Monitorar eletrólitos", "Corticoide IV"], didYouKnow: "Reposição agressiva e rápida de soro num idoso com cor pulmonale pode causar edema agudo e afogar o pulmão." },
+      { name: "Fisiopatologia do Frio", color: "var(--violet)", items: ["Vasoespasmo", "Muco viscoso", "Redução do batimento ciliar", "Infecção secundária"], didYouKnow: "O ar gelado paralisa os 'cílios' microscópicos da traqueia, que param de varrer a sujeira para fora do pulmão." }
     ],
   },
   {
     id: "hard-5",
     tier: "hard",
     levelNumber: 5,
-    title: "Fase 5: Exacerbações Climáticas",
-    subtitle: "Fisiopatologia do estresse térmico",
-    icon: "alert-triangle",
+    title: "Fase 15: Cuidados Paliativos",
+    subtitle: "Dignidade, conforto e fim de vida",
+    icon: "shield",
     groups: [
-      { name: "Estresse Térmico", color: "var(--gold)", items: ["Vasodilatação", "Aumento do débito", "Fadiga", "Descompensação"], didYouKnow: "O corpo tenta se resfriar dilatando os vasos, obrigando o coração a bater mais rápido e sobrecarregando o sistema." },
-      { name: "Material Particulado (PM2.5)", color: "var(--mint)", items: ["Penetração alveolar", "Inflamação sistêmica", "Estresse oxidativo", "Pico de crise"], didYouKnow: "Partículas finas de queimadas atravessam os alvéolos, entram no sangue e causam inflamação violenta." },
-      { name: "Manejo Avançado no PS", color: "var(--sky)", items: ["Reposição cuidadosa", "Hipertermia", "Ajuste de O2", "Prevenção de edema"], didYouKnow: "Reposição agressiva de soro em paciente com cor pulmonale desidratado pelo calor pode gerar edema agudo de pulmão." },
-      { name: "Dados Epidemiológicos", color: "var(--violet)", items: ["Mais internações", "UTI lotada", "Hipoxemia agravada", "Mortalidade idosa"], didYouKnow: "Ondas de calor do El Niño aumentam exponencialmente a mortalidade por falência respiratória em idosos com DPOC." }
+      { name: "Foco do Cuidado", color: "var(--gold)", items: ["Alívio do sofrimento", "Conforto total", "Qualidade de vida", "Dignidade"], didYouKnow: "Cuidados paliativos não significam 'desistir', mas sim mudar o foco da cura impossível para o bem-estar absoluto do paciente." },
+      { name: "Manejo da Dispneia", color: "var(--mint)", items: ["Morfina baixa dose", "Ventilador no rosto", "Ansiedade controlada", "Benzodiazepínicos"], didYouKnow: "A morfina, em baixas doses guiadas, atua no cérebro desligando a sensação aterrorizante de sufocamento (fome de ar)." },
+      { name: "Suporte Avançado", color: "var(--sky)", items: ["Uso de VNI", "Limitação terapêutica", "Sedação paliativa", "Extubação compassiva"], didYouKnow: "A Ventilação Não Invasiva (máscara de BIPAP) é muitas vezes usada apenas para conforto respiratório, sem intenção de cura." },
+      { name: "Diretivas Antecipadas", color: "var(--violet)", items: ["Testamento vital", "Vontade do paciente", "Reunião familiar", "Processo de luto"], didYouKnow: "Permitir que o paciente decida antecipadamente, de forma lúcida, se quer ou não ser intubado, garante autonomia na terminalidade." }
     ],
   },
 ];
