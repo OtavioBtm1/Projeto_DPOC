@@ -29,7 +29,8 @@ const SCREENS = {
   ranking: RankingScreen,
 };
 
-const BGM_URL = musicaFundo;;
+const BGM_URL = musicaFundo;
+
 export default function App() {
   const { screen, heartRate } = useGame();
   const ActiveScreen = SCREENS[screen] ?? MainMenu;
@@ -57,16 +58,13 @@ export default function App() {
   // DESBLOQUEIO DE ÁUDIO MOBILE NO PRIMEIRO TOQUE
   useEffect(() => {
     const unlockAudio = async () => {
-      // 1. Acorda os efeitos sonoros do SoundController
       soundManager.ensureContext();
 
-      // 2. Conecta a música ambiente à Web Audio API
       if (audioRef.current) {
         if (typeof soundManager.connectBGM === 'function') {
           soundManager.connectBGM(audioRef.current);
         }
         
-        // Joga o sinal original no máximo (quem abaixa o volume agora é o SoundManager)
         audioRef.current.volume = 1;
 
         if (!isMuted) {
@@ -79,7 +77,6 @@ export default function App() {
       }
     };
 
-    // O "capture: true" e "once: true" são a mágica que impede o React de bloquear o evento!
     window.addEventListener("click", unlockAudio, { capture: true, once: true });
     window.addEventListener("touchstart", unlockAudio, { capture: true, once: true });
 
@@ -88,6 +85,7 @@ export default function App() {
       window.removeEventListener("touchstart", unlockAudio, { capture: true });
     };
   }, [isMuted]);
+
   // Fechar popover ao clicar fora
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -103,7 +101,7 @@ export default function App() {
     };
   }, []);
 
-  // Sincroniza áudio e SoundManager (removido o audioRef.current.volume daqui)
+  // Sincroniza áudio e SoundManager
   useEffect(() => {
     soundManager.setVolume(volume);
     localStorage.setItem("respconex_master_volume", volume.toString());
@@ -123,7 +121,7 @@ export default function App() {
   const handleVolumeChange = (e) => {
     const newVol = parseFloat(e.target.value);
     setVolume(newVol);
-    soundManager.setVolume(newVol); // O SoundManager gerencia o volume agora
+    soundManager.setVolume(newVol); 
 
     if (newVol > 0 && isMuted) {
       setIsMuted(false);
@@ -136,100 +134,7 @@ export default function App() {
 
   return (
     <div className="app">
-      {/* ATENÇÃO: crossOrigin="anonymous" adicionado aqui */}
       <audio ref={audioRef} src={BGM_URL} loop preload="auto" playsInline />
-
-      {/* CONTROLE DE ÁUDIO RESPONSIVO */}
-      <div
-        ref={popoverRef}
-        style={{
-          position: "fixed",
-          // MÁGICA AQUI: Desce a ilha + espaço suficiente pra ficar na linha do TopBar
-          top: "calc(60px + env(safe-area-inset-top))", 
-          right: "14px",
-          zIndex: 9000,
-        }}
-      >
-        <button
-          onClick={() => setShowAudioPopover((prev) => !prev)}
-          title="Configurações de Áudio"
-          aria-label="Configurações de Áudio"
-          style={{
-            background: "rgba(7, 25, 32, 0.9)",
-            border: "1px solid rgba(56, 189, 248, 0.4)",
-            color: isMuted || volume === 0 ? "#94a3b8" : "#38bdf8",
-            borderRadius: "50%",
-            width: "36px",
-            height: "36px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: "1rem",
-            cursor: "pointer",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
-            backdropFilter: "blur(6px)",
-          }}
-        >
-          {isMuted || volume === 0 ? "🔇" : volume < 0.5 ? "🔉" : "🔊"}
-        </button>
-
-        {showAudioPopover && (
-          <div
-            style={{
-              position: "absolute",
-              top: "calc(44px + env(safe-area-inset-top))",
-              right: "0",
-              background: "#071920",
-              border: "1px solid #1e4d5f",
-              borderRadius: "12px",
-              padding: "10px 14px",
-              width: "160px",
-              boxShadow: "0 8px 24px rgba(0,0,0,0.6)",
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <span style={{ fontSize: "0.75rem", color: "#94a3b8", fontWeight: "600" }}>Volume Geral</span>
-              <button
-                onClick={toggleMute}
-                style={{
-                  background: "transparent",
-                  border: "none",
-                  color: isMuted ? "#f87171" : "#34d399",
-                  fontSize: "0.7rem",
-                  fontWeight: "700",
-                  cursor: "pointer",
-                  padding: 0,
-                }}
-              >
-                {isMuted ? "DESMUTAR" : "MUTAR"}
-              </button>
-            </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.05"
-                value={isMuted ? 0 : volume}
-                onChange={handleVolumeChange}
-                style={{
-                  width: "100%",
-                  height: "6px",
-                  cursor: "pointer",
-                  accentColor: "#38bdf8",
-                }}
-              />
-              <span style={{ fontSize: "0.75rem", color: "#cbd5e1", minWidth: "28px", textAlign: "right" }}>
-                {isMuted ? "0%" : `${Math.round(volume * 100)}%`}
-              </span>
-            </div>
-          </div>
-        )}
-      </div>
 
       {/* Splash Screen */}
       {showSplash && (
@@ -273,9 +178,100 @@ export default function App() {
 
       <AchievementPopup />
       <div className={`danger-overlay danger-overlay--${heartRate}`} />
-
       <EcgSignature heartRate={heartRate} />
-      <TopBar />
+      
+      {/* O TopBar agora envolve o Controle de Áudio! */}
+      <TopBar>
+        {/* CONTROLE DE ÁUDIO RESPONSIVO (MUDOU PARA RELATIVE) */}
+        <div
+          ref={popoverRef}
+          style={{
+            position: "relative", // Deixou de ser fixed
+          }}
+        >
+          <button
+            onClick={() => setShowAudioPopover((prev) => !prev)}
+            title="Configurações de Áudio"
+            aria-label="Configurações de Áudio"
+            style={{
+              background: "rgba(7, 25, 32, 0.9)",
+              border: "1px solid rgba(56, 189, 248, 0.4)",
+              color: isMuted || volume === 0 ? "#94a3b8" : "#38bdf8",
+              borderRadius: "50%",
+              width: "36px",
+              height: "36px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "1rem",
+              cursor: "pointer",
+              boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
+              backdropFilter: "blur(6px)",
+            }}
+          >
+            {isMuted || volume === 0 ? "🔇" : volume < 0.5 ? "🔉" : "🔊"}
+          </button>
+
+          {showAudioPopover && (
+            <div
+              style={{
+                position: "absolute",
+                top: "120%", // Abre logo abaixo do botão
+                right: "0", // Alinhado à direita
+                background: "#071920",
+                border: "1px solid #1e4d5f",
+                borderRadius: "12px",
+                padding: "10px 14px",
+                width: "160px",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.6)",
+                display: "flex",
+                flexDirection: "column",
+                gap: "8px",
+                zIndex: 9000,
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontSize: "0.75rem", color: "#94a3b8", fontWeight: "600" }}>Volume Geral</span>
+                <button
+                  onClick={toggleMute}
+                  style={{
+                    background: "transparent",
+                    border: "none",
+                    color: isMuted ? "#f87171" : "#34d399",
+                    fontSize: "0.7rem",
+                    fontWeight: "700",
+                    cursor: "pointer",
+                    padding: 0,
+                  }}
+                >
+                  {isMuted ? "DESMUTAR" : "MUTAR"}
+                </button>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={isMuted ? 0 : volume}
+                  onChange={handleVolumeChange}
+                  style={{
+                    width: "100%",
+                    height: "6px",
+                    cursor: "pointer",
+                    accentColor: "#38bdf8",
+                  }}
+                />
+                <span style={{ fontSize: "0.75rem", color: "#cbd5e1", minWidth: "28px", textAlign: "right" }}>
+                  {isMuted ? "0%" : `${Math.round(volume * 100)}%`}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </TopBar>
+
       <ActiveScreen key={screen} />
     </div>
   );

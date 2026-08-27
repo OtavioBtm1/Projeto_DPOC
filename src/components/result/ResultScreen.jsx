@@ -31,7 +31,7 @@ export default function ResultScreen() {
   if (!lastResult) return null;
 
   const { won, puzzle, solvedCount = 0, totalGroups = 4 } = lastResult;
-  const difficultyConfig = DIFFICULTIES[difficulty] || DIFFICULTIES.normal;
+const difficultyConfig = DIFFICULTIES[difficulty] || { label: "Treinamento", lives: 3 };
   const selectedThemeTitle = puzzle?.title || "Trilha DPOC";
 
   // Identifica o índice atual e a próxima fase da trilha
@@ -40,14 +40,17 @@ export default function ResultScreen() {
     ? THEMES[currentThemeIndex + 1] 
     : null;
 
+  // ✨ MÁGICA AQUI: Identifica se é a tela de resultado do tutorial
+  const isTutorial = puzzle?.id === "tutorial-1";
+
   // --- CÁLCULO DE PONTOS PARA EXIBIÇÃO NA TELA ---
   const livesRemaining = lastResult.livesRemaining ?? 0;
-  const totalLives = difficultyConfig.lives;
+  const totalLives = difficultyConfig.lives || 3;
   
   let pointsEarned = 0;
   let flawlessBonus = false;
 
-  if (won) {
+  if (won && !isTutorial) { // Tutorial não dá pontos!
     if (difficulty === "facil" || difficulty === "easy") pointsEarned = 10;
     else if (difficulty === "medio" || difficulty === "medium") pointsEarned = 25;
     else if (difficulty === "dificil" || difficulty === "hard") pointsEarned = 50;
@@ -73,15 +76,17 @@ export default function ResultScreen() {
       });
     }
 
-    // Registra estatísticas e avalia conquistas
-    recordGameResult(
-      won,
-      difficulty,
-      lastResult.livesRemaining,
-      difficultyConfig.lives,
-      lastResult.hintsUsed || 0,
-      puzzle?.tier || "easy"
-    );
+    // Registra estatísticas
+    if (!isTutorial) {
+      recordGameResult(
+        won,
+        difficulty,
+        lastResult.livesRemaining,
+        totalLives,
+        lastResult.hintsUsed || 0,
+        puzzle?.tier || "easy"
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -116,7 +121,7 @@ export default function ResultScreen() {
     const icon = won ? "🫁✨" : "🫁🩺";
     const text = `${icon} Jogo Educativo DPOC
 Fase: ${puzzle.title}
-Dificuldade: ${difficultyConfig.label}
+Dificuldade: ${difficultyConfig.label || "Treinamento"}
 Resultado: ${won ? "Fase Concluída! 🎉" : `Completou ${solvedCount}/${totalGroups} grupos`}
 Aprenda sobre saúde respiratória e prevenção!`;
 
@@ -145,13 +150,13 @@ Aprenda sobre saúde respiratória e prevenção!`;
         <h1 className="result-title">{won ? "Fase Concluída com Sucesso!" : "Fim de partida"}</h1>
         <p className="result-sub">
           {won
-            ? "Você dominou as correlações desta fase de DPOC. Revise os conceitos abaixo ou siga para a próxima etapa!"
+            ? (isTutorial ? "Você aprendeu a jogar! Agora os níveis oficiais estão liberados." : "Você dominou as correlações desta fase de DPOC. Revise os conceitos abaixo ou siga para a próxima etapa!")
             : "Você praticou conceitos importantes. Aproveite o caderno abaixo para revisar os grupos e suas explicações."}
         </p>
       </div>
 
-      {/* --- CAIXA DE RECOMPENSA DE PONTOS E PATENTE --- */}
-      {won && (
+      {/* --- CAIXA DE RECOMPENSA (Não aparece no tutorial) --- */}
+      {won && !isTutorial && (
         <div style={{ 
           background: "#051318", 
           border: "1px solid #1e4d5f", 
@@ -182,7 +187,7 @@ Aprenda sobre saúde respiratória e prevenção!`;
         </div>
         <div className="result-meta-item">
           <span>modo de vidas</span>
-          <strong>{difficultyConfig.label}</strong>
+          <strong>{isTutorial ? "Treinamento" : difficultyConfig.label}</strong>
         </div>
         <div className="result-meta-item">
           <span>grupos</span>
@@ -193,8 +198,27 @@ Aprenda sobre saúde respiratória e prevenção!`;
       </div>
 
       <div className="result-actions">
-        {/* Botão de Avanço Imediato para a Próxima Fase */}
-        {won && nextTheme && (
+        
+        {/* BOTÃO EXCLUSIVO DE AVANÇO DO TUTORIAL */}
+        {won && isTutorial && (
+          <button
+            className="btn btn--primary result-main-action"
+            style={{
+              fontSize: "1.05rem",
+              boxShadow: "0 0 20px rgba(250, 204, 21, 0.6)",
+              background: "var(--gold)",
+              color: "#000",
+              border: "none",
+              animation: "pulse 2s infinite"
+            }}
+            onClick={() => goTo("themes")}
+          >
+            🎓 Treinamento Concluído! Iniciar Nível Estudante ➡️
+          </button>
+        )}
+
+        {/* Botão Normal de Avanço Imediato para a Próxima Fase */}
+        {won && nextTheme && !isTutorial && (
           <button
             className="btn btn--primary result-main-action"
             style={{
@@ -229,9 +253,11 @@ Aprenda sobre saúde respiratória e prevenção!`;
           <button className="btn" onClick={openThemes}>
             🗺️ Trilha de Fases
           </button>
-          <button className="btn" onClick={openDifficulty}>
-            ⚡ Mudar Vidas
-          </button>
+          {!isTutorial && (
+            <button className="btn" onClick={openDifficulty}>
+              ⚡ Mudar Vidas
+            </button>
+          )}
         </div>
 
         <button className="btn result-menu-action" onClick={backToMenu}>
