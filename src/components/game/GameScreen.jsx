@@ -88,7 +88,8 @@ export default function GameScreen() {
         <div className="puzzle-title">{puzzle.title}</div>
       </div>
 
-      <div className="game-board-container">
+      {/* ADICIONADO: overflowY e paddingBottom para evitar qualquer sobreposição */}
+      <div className="game-board-container" style={{ overflowY: "auto", paddingBottom: "140px" }}>
         {/* LISTA DE TEMAS */}
         <div className="solved-bands">
           {puzzle.groups.map((group, index) => {
