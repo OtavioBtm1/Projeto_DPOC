@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGame } from "../../context/GameContext";
 import { usePuzzle } from "../../hooks/usePuzzle";
 import LivesIndicator from "./LivesIndicator";
@@ -25,6 +25,9 @@ export default function GameScreen() {
     checkSelection,
   } = usePuzzle(difficulty, chosenThemeId);
 
+  // ✨ NOVO ESTADO: Controla qual dica estamos visualizando
+  const [hintOffset, setHintOffset] = useState(0);
+
   // Controle dos batimentos do ECG
   useEffect(() => {
     if (gameOver === "lost") {
@@ -45,11 +48,15 @@ export default function GameScreen() {
     return () => setHeartRate("normal");
   }, [setHeartRate]);
 
+  // ✨ NOVA LÓGICA: Reseta a dica atual quando o jogador acerta um grupo
+  useEffect(() => {
+    setHintOffset(0);
+  }, [solvedGroups.length]);
+
   // Salva os resultados assim que o jogo acaba
   useEffect(() => {
     if (!gameOver) return undefined;
 
-    // Salva no navegador que o tutorial foi completado!
     if (gameOver === "won" && puzzle?.id === "tutorial-1") {
       localStorage.setItem("respconex_tutorial_done", "true");
     }
@@ -69,13 +76,26 @@ export default function GameScreen() {
     return null;
   }
 
-  // Filtra as peças que ainda NÃO foram resolvidas
   const remainingTiles = tiles
     .map((tile, originalIndex) => ({ tile, originalIndex }))
     .filter(({ tile }) => !solvedGroups.includes(tile.groupIndex));
 
-  // ✨ MÁGICA AQUI: Acha automaticamente qual é o próximo grupo que o jogador tem que resolver no tutorial
   const nextTutorialGroupIndex = puzzle.groups.findIndex((_, index) => !solvedGroups.includes(index));
+
+  // ✨ NOVA LÓGICA: Calcula quais dicas ainda não foram resolvidas
+  const unsolvedIndices = puzzle.groups
+    .map((_, index) => index)
+    .filter((index) => !solvedGroups.includes(index));
+
+  // Pega o índice real do grupo da dica que vamos mostrar
+  const activeHintGroupIndex = unsolvedIndices.length > 0 
+    ? unsolvedIndices[hintOffset % unsolvedIndices.length] 
+    : null;
+
+  // Função para girar a dica no botão 🔄
+  const handleNextHint = () => {
+    setHintOffset((prev) => prev + 1);
+  };
 
   return (
     <section className="screen screen--active screen--game">
@@ -88,15 +108,15 @@ export default function GameScreen() {
         <div className="puzzle-title">{puzzle.title}</div>
       </div>
 
-      {/* ADICIONADO: overflowY e paddingBottom para evitar qualquer sobreposição */}
-      <div className="game-board-container" style={{ overflowY: "auto", paddingBottom: "140px" }}>
-        {/* LISTA DE TEMAS */}
-        <div className="solved-bands">
+      {/* Container flexível do tabuleiro */}
+      <div className="game-board-container">
+        
+        {/* LISTA DE TEMAS E DICA ÚNICA - Com margem para descer o tabuleiro */}
+        <div className="solved-bands" style={{ marginBottom: "36px", width: "100%" }}>
+          
+          {/* 1. Renderiza APENAS os grupos já resolvidos */}
           {puzzle.groups.map((group, index) => {
-            const isSolved = solvedGroups.includes(index);
-
-            // SE TIVER RESOLVIDO: Mostra a faixa colorida
-            if (isSolved) {
+            if (solvedGroups.includes(index)) {
               return (
                 <SolvedBand
                   key={`group-${index}`}
@@ -107,38 +127,63 @@ export default function GameScreen() {
                 />
               );
             }
-
-            // SE NÃO TIVER RESOLVIDO: Mostra a caixa cinza tracejada com a Pista
-            return (
-              <div 
-                key={`group-${index}`}
-                style={{
-                  background: "rgba(15, 23, 42, 0.4)",
-                  border: "1.5px dashed rgba(148, 163, 184, 0.3)",
-                  borderRadius: "12px",
-                  padding: "16px 12px",
-                  marginBottom: "8px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "8px",
-                  color: "#94a3b8",
-                  fontWeight: "600",
-                  fontSize: "0.95rem",
-                  boxShadow: "inset 0 2px 4px rgba(0,0,0,0.1)"
-                }}
-              >
-                <span style={{ fontSize: "1.2rem", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.5))" }}>🔍</span>
-                <span>{group.hint || "Desvende o mistério..."}</span>
-              </div>
-            );
+            return null;
           })}
+
+          {/* 2. Renderiza APENAS UMA dica para os grupos restantes */}
+          {activeHintGroupIndex !== null && (
+            <div 
+              key={`hint-${activeHintGroupIndex}`} // Ajuda o React a animar quando muda
+              style={{
+                background: "rgba(15, 23, 42, 0.4)",
+                border: "1.5px dashed rgba(148, 163, 184, 0.3)",
+                borderRadius: "12px",
+                padding: "16px 12px",
+                marginBottom: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between", // Afasta a dica do botão
+                gap: "8px",
+                color: "#94a3b8",
+                fontWeight: "600",
+                fontSize: "0.95rem",
+                boxShadow: "inset 0 2px 4px rgba(0,0,0,0.1)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: "12px", flex: 1 }}>
+                <span style={{ fontSize: "1.3rem", filter: "drop-shadow(0 2px 4px rgba(0,0,0,0.5))" }}>🔍</span>
+                <span>{puzzle.groups[activeHintGroupIndex].hint || "Desvende o mistério..."}</span>
+              </div>
+
+              {/* Só mostra o botão se tiver mais de 1 dica para resolver */}
+              {unsolvedIndices.length > 1 && (
+                <button
+                  onClick={handleNextHint}
+                  title="Trocar dica"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.1)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    borderRadius: "50%",
+                    width: "42px",
+                    height: "42px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                    fontSize: "1.2rem",
+                    flexShrink: 0,
+                  }}
+                >
+                  🔄
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Grid de peças restantes */}
         {!gameOver && remainingTiles.length > 0 && (
           <>
-            {/* MENSAGEM DO TUTORIAL (Fica fixa até ele acabar a fase) */}
             {puzzle.id === "tutorial-1" && (
               <div style={{
                 background: "rgba(56, 189, 248, 0.1)",
@@ -150,7 +195,6 @@ export default function GameScreen() {
                 fontSize: "0.9rem",
                 marginBottom: "12px",
                 border: "1px solid rgba(56, 189, 248, 0.3)",
-                animation: "popIn 0.5s ease-out"
               }}>
                 👋 Tutorial: Selecione as 4 peças piscando e clique em "Verificar"!
               </div>
@@ -165,7 +209,6 @@ export default function GameScreen() {
                   solved={false}
                   shake={shakeIds.includes(originalIndex)}
                   onClick={() => toggleTile(originalIndex)}
-                  // AGORA ELE SEMPRE VAI PISCAR AS 4 PEÇAS DO PRÓXIMO GRUPO!
                   isTutorial={puzzle.id === "tutorial-1" && tile.groupIndex === nextTutorialGroupIndex}
                 />
               ))}
@@ -174,35 +217,23 @@ export default function GameScreen() {
         )}
       </div>
 
-      {/* Mensagem de status */}
       <div className="status-msg" role="status" aria-live="polite" style={{ color: `var(--${status.tone})` }}>
         {gameOver === "won" ? "✨ Desafio concluído com sucesso!" : status.message || "\u00A0"}
       </div>
 
-      {/* Botões de Ação na base */}
       <div className="game-actions">
         {gameOver ? (
           <button 
             className="btn btn--primary" 
-            style={{ 
-              width: "100%", 
-              padding: "16px", 
-              fontSize: "1.1rem",
-              boxShadow: "0 0 20px rgba(56, 189, 248, 0.4)",
-              animation: "popIn 0.4s ease-out"
-            }} 
+            style={{ width: "100%", padding: "16px", fontSize: "1.1rem" }} 
             onClick={() => goTo("result")}
           >
             {gameOver === "won" ? "🎉 Finalizar nível ➡️" : "Ver Caderno de Respostas ➡️"}
           </button>
         ) : (
           <>
-            <button className="btn" onClick={shuffleBoard} title="Reorganizar peças">
-              🔀 Embaralhar
-            </button>
-            <button className="btn" onClick={clearSelection} disabled={selected.length === 0} title="Desmarcar todas">
-              ✕ Limpar
-            </button>
+            <button className="btn" onClick={shuffleBoard}>🔀 Embaralhar</button>
+            <button className="btn" onClick={clearSelection} disabled={selected.length === 0}>✕ Limpar</button>
             <button className="btn btn--primary" disabled={selected.length !== 4} onClick={checkSelection}>
               Verificar
             </button>

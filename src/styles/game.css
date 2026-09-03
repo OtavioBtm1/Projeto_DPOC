@@ -1,33 +1,137 @@
-/* Estilos especificos da tela de jogo: vidas, tabuleiro, pecas e
-   faixas de grupos resolvidos. */
+/* =========================================================
+   ESTILOS GERAIS DA TELA DE JOGO E CONTAINERS
+   ========================================================= */
 
+/* 1. Trava a tela inteira para ficar com aspecto de App Nativo */
+.screen--game {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh; /* Pega a altura exata da tela */
+  max-width: 480px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow: hidden; /* Trava o scroll geral */
+}
+
+/* 2. O cabeçalho do jogo (Vidas, Título, etc) */
 .game-top {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 14px;
+  gap: 12px;
+  flex-wrap: wrap; /* Permite quebrar linha se faltar espaço */
+  padding: 10px 16px;
 }
+
+/* 3. O meio do jogo (Dica + Tabuleiro) */
+.game-board-container {
+  flex: 1; /* Absorve o espaço vazio do meio */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centraliza tudo verticalmente */
+  align-items: center;
+  width: 100%;
+  overflow-y: auto; /* Scroll apenas aqui no meio se precisar */
+  padding: 0 8px; /* Margem lateral pequena para ganhar largura */
+}
+
+/* 4. Crava os botões no fundo da tela */
+.game-actions {
+  margin-top: auto; /* Empurra os botões para o fundo */
+  padding: 12px 16px 24px 16px; /* Folga para não encostar na borda */
+  width: 100%;
+  background: transparent;
+  display: flex;
+  gap: 8px;
+}
+
+/* =========================================================
+   ESTILOS DO TABULEIRO (GRID E PEÇAS)
+   ========================================================= */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  width: 100%;
+  height: max-content; /* A MÁGICA: Impede o tabuleiro de esticar verticalmente */
+}
+
+.tile {
+  background: var(--bg-panel);
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  
+  /* Respiro do texto */
+  padding: 6px 4px; 
+  line-height: 1.15; 
+  font-size: clamp(0.7rem, 2.8vw, 0.9rem); 
+  
+  /* Altura fixa e segura para os botões não explodirem */
+  min-height: 60px;
+  max-height: 75px;
+  word-break: break-word; 
+  
+  color: var(--text-hi);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.tile:hover {
+  border-color: var(--sky);
+}
+
+.tile--selected {
+  background: #1f5561;
+  border-color: var(--mint);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 14px rgba(127, 216, 192, 0.18);
+}
+
+.tile--shake {
+  animation: shake 0.4s ease;
+}
+
+.tile--solved-hidden {
+  visibility: hidden;
+}
+
+/* =========================================================
+   ELEMENTOS DE INTERFACE E FAIXAS DE DICA/RESOLUÇÃO
+   ========================================================= */
+
 .lives {
   display: flex;
   gap: 5px;
   align-items: center;
 }
+
 .lung-icon path {
   transition: fill 0.15s ease;
 }
+
 .lung-icon--off path {
   fill: var(--line);
 }
+
 .lung-icon--on path {
   fill: var(--coral);
   filter: drop-shadow(0 0 4px rgba(240, 101, 61, 0.6));
 }
+
 .attempts-label {
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-low);
   margin-left: 6px;
 }
+
 .puzzle-title {
   font-family: var(--font-mono);
   font-size: 11px;
@@ -36,102 +140,13 @@
   color: var(--text-low);
 }
 
-.solved-bands {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-.band {
-  border-radius: 10px;
-  padding: 12px 14px;
-  animation: band-in 0.35s ease;
-}
-@keyframes band-in {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-.band-title {
-  font-family: var(--font-display);
-  font-weight: 700;
-  font-size: 13px;
-  color: #0a1f26;
-}
-.band-items {
-  font-family: var(--font-body);
-  font-size: 11.5px;
-  color: #0a1f26;
-  opacity: 0.85;
-  margin-top: 2px;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  margin: 10px 0 16px;
-}
-@media (max-width: 420px) {
-  .grid {
-    gap: 6px;
-  }
-}
-.tile {
-  background: var(--bg-panel);
-  border: 1.5px solid var(--line);
-  border-radius: 10px;
-  min-height: 74px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 8px 6px;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1.25;
-  color: var(--text-hi);
-  cursor: pointer;
-  user-select: none;
-  transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
-}
-.tile:hover {
-  border-color: var(--sky);
-}
-.tile--selected {
-  background: #1f5561;
-  border-color: var(--mint);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 14px rgba(127, 216, 192, 0.18);
-}
-.tile--shake {
-  animation: shake 0.4s ease;
-}
-.tile--solved-hidden {
-  visibility: hidden;
-}
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  20% {
-    transform: translateX(-6px);
-  }
-  40% {
-    transform: translateX(6px);
-  }
-  60% {
-    transform: translateX(-4px);
-  }
-  80% {
-    transform: translateX(4px);
-  }
+.game-progress-badge {
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 3px 8px;
+  border-radius: 12px;
+  color: var(--text-dim, #a0aec0);
 }
 
 .status-msg {
@@ -142,13 +157,21 @@
   margin-bottom: 10px;
 }
 
+.solved-bands {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
 
-/* ---------- Estilos Educativos & UX Adicionados ---------- */
 .band {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  border-radius: 10px;
+  padding: 12px 14px;
   transition: all 0.25s ease;
+  animation: band-in 0.35s ease;
 }
 
 .band-main {
@@ -160,6 +183,21 @@
 
 .band-content {
   flex: 1;
+}
+
+.band-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 13px;
+  color: #0a1f26;
+}
+
+.band-items {
+  font-family: var(--font-body);
+  font-size: 11.5px;
+  color: #0a1f26;
+  opacity: 0.85;
+  margin-top: 2px;
 }
 
 .band-toggle-btn {
@@ -209,15 +247,6 @@
   color: rgba(255, 255, 255, 0.95);
 }
 
-.game-progress-badge {
-  font-family: var(--font-mono, monospace);
-  font-size: 11px;
-  background: rgba(255, 255, 255, 0.08);
-  padding: 3px 8px;
-  border-radius: 12px;
-  color: var(--text-dim, #a0aec0);
-}
-
 .game-hint-box {
   display: flex;
   align-items: center;
@@ -232,80 +261,41 @@
   animation: band-in 0.2s ease;
 }
 
-.btn--hint {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.2);
+/* =========================================================
+   ANIMAÇÕES E MEDIA QUERIES (CELULARES)
+   ========================================================= */
+
+@keyframes band-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-.btn--hint:hover:not(:disabled) {
-  background: rgba(236, 201, 75, 0.15);
-  border-color: var(--gold, #ecc94b);
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-6px); }
+  40% { transform: translateX(6px); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
 }
 
-.result-share-btn {
-  background: rgba(127, 216, 192, 0.15);
-  border-color: var(--mint, #7fd8c0);
-  color: #fff;
-  font-weight: 600;
-}
-
-.result-share-btn:hover {
-  background: rgba(127, 216, 192, 0.25);
-}
-
-
-/* Container de jogo ajustado para altura móvel */
-.screen--game {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 100dvh;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 0.6rem;
-  box-sizing: border-box;
-  overflow: hidden;
-}
-
-.game-board-container {
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-  width: 100%;
-  flex: 1;
-  justify-content: center;
-  min-height: 0;
-}
-
-.solved-bands {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
-  width: 100%;
-}
-
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 0.35rem;
-  width: 100%;
-}
-
-.tile {
-  min-height: 48px;
-  max-height: 68px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 0.25rem;
-  font-size: clamp(0.7rem, 2.4vw, 0.85rem);
-  line-height: 1.15;
-  border-radius: 6px;
-  word-break: break-word;
-}
 @keyframes pulse {
   0% { transform: scale(1); }
   50% { transform: scale(1.05); }
   100% { transform: scale(1); }
+}
+
+@media (max-width: 480px) {
+  .game-top {
+    flex-direction: column; 
+    align-items: flex-start;
+  }
+  
+  .game-top .puzzle-title {
+    width: 100%; 
+    margin-top: 4px;
+  }
+  
+  .grid {
+    gap: 4px; /* Mais coladinho em telas muito pequenas para as peças não diminuírem tanto */
+  }
 }
