@@ -33,7 +33,7 @@ export const THEMES = [
     id: "tutorial-1",
     tier: "tutorial",
     levelNumber: 0,
-    title: "Treinamento Básico",
+    title: " Treinamento Básico",
     subtitle: "Aprenda as regras do jogo RespConex",
     icon: "activity",
     groups: [
