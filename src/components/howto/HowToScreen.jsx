@@ -28,8 +28,8 @@ export default function HowToScreen() {
         voltam e — dependendo da dificuldade — <b>uma vida é perdida</b>.
       </HowToStep>
       <HowToStep number={4}>
-        No modo <b>Fácil</b> não há limite de tentativas. Nos modos <b>Médio (4 vidas)</b> e{" "}
-        <b>Difícil (3 vidas)</b>, o jogo termina se as vidas acabarem antes de formar os 4 grupos.
+        No modo <b>Fácil</b> não há limite de tentativas. Nos modos <b>Médio (7 vidas)</b> e{" "}
+        <b>Difícil (5 vidas)</b>, o jogo termina se as vidas acabarem antes de formar os 4 grupos.
       </HowToStep>
       <HowToStep number={5}>
         Encontre os 4 grupos para vencer a rodada e revisar o conteúdo completo sobre DPOC.

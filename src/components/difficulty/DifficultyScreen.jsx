@@ -5,8 +5,8 @@ import DifficultyCard from "./DifficultyCard";
 
 const DESCRIPTIONS = {
   facil: "Tentativas ilimitadas. Ideal para quem está conhecendo o conteúdo pela primeira vez, sem pressão.",
-  medio: "2 Chances. Você erra e o jogo avisa, mas tem margem para tentar de novo.",
-  dificil: "1 Chance. Menor margem de erro — para quem já domina o conteúdo e quer se desafiar.",
+  medio: "7 Vidas. Você erra e o jogo avisa, mas tem margem para tentar de novo.",
+  dificil: "5 Vidas . Menor margem de erro — para quem já domina o conteúdo e quer se desafiar.",
 };
 
 export default function DifficultyScreen() {
